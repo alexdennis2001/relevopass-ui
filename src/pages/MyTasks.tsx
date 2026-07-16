@@ -5,14 +5,12 @@ import {
   Button,
   Card,
   CardContent,
-  Chip,
   CircularProgress,
   Stack,
   Typography,
 } from "@mui/material";
 import { apiClient } from "../lib/apiClient";
 import { getApiErrorMessage } from "../lib/apiError";
-import type { StepStatus } from "../types/process";
 
 type MyStepTask = {
   Id: string;
@@ -22,8 +20,9 @@ type MyStepTask = {
   Title: string;
   Description: string | null;
   ActionLabel: string;
-  Status: StepStatus;
   CompletionCount: number;
+  TotalSubsteps: number;
+  CompletedSubsteps: number;
 };
 
 type MySubstepTask = {
@@ -35,14 +34,7 @@ type MySubstepTask = {
   Title: string;
   Description: string | null;
   ActionLabel: string;
-  Status: StepStatus;
   CompletionCount: number;
-};
-
-const statusColor: Record<StepStatus, "default" | "warning" | "success"> = {
-  WAITING: "default",
-  PENDING: "warning",
-  COMPLETED: "success",
 };
 
 export function MyTasks() {
@@ -135,48 +127,36 @@ export function MyTasks() {
         Steps
       </Typography>
       {steps.length === 0 && (
-        <Typography color="text.secondary">No assigned steps.</Typography>
+        <Typography color="text.secondary">
+          Nothing waiting on your approval right now.
+        </Typography>
       )}
       <Stack spacing={2} sx={{ mb: 3 }}>
-        {steps.map((step) => (
-          <Card key={step.Id} variant="outlined">
-            <CardContent>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <Box>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    {step.ProcessName}
-                  </Typography>
-                  <Typography variant="body1">
-                    Step {step.Position}: {step.Title}
-                  </Typography>
-                </Box>
-                <Chip
-                  label={step.Status}
-                  color={statusColor[step.Status]}
-                  size="small"
-                />
-              </Box>
-              {step.Description && (
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ mt: 0.5 }}
-                >
-                  {step.Description}
+        {steps.map((step) => {
+          const blocked = step.CompletedSubsteps < step.TotalSubsteps;
+          return (
+            <Card key={step.Id} variant="outlined">
+              <CardContent>
+                <Typography variant="subtitle2" color="text.secondary">
+                  {step.ProcessName}
                 </Typography>
-              )}
-              {step.Status === "PENDING" && (
+                <Typography variant="body1">
+                  Step {step.Position}: {step.Title}
+                </Typography>
+                {step.Description && (
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mt: 0.5 }}
+                  >
+                    {step.Description}
+                  </Typography>
+                )}
                 <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
                   <Button
                     variant="contained"
                     size="small"
-                    disabled={busyId === step.Id}
+                    disabled={busyId === step.Id || blocked}
                     onClick={() => handleCompleteStep(step.Id)}
                   >
                     {step.ActionLabel}
@@ -193,10 +173,21 @@ export function MyTasks() {
                     </Button>
                   )}
                 </Stack>
-              )}
-            </CardContent>
-          </Card>
-        ))}
+                {blocked && (
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ display: "block", mt: 0.5 }}
+                  >
+                    Waiting on {step.TotalSubsteps - step.CompletedSubsteps}{" "}
+                    of {step.TotalSubsteps} subprocesses to be completed
+                    before this can be approved.
+                  </Typography>
+                )}
+              </CardContent>
+            </Card>
+          );
+        })}
       </Stack>
 
       <Typography variant="subtitle1" sx={{ mt: 2, mb: 1 }}>
@@ -204,32 +195,17 @@ export function MyTasks() {
       </Typography>
       {substeps.length === 0 && (
         <Typography color="text.secondary">
-          No assigned subprocesses.
+          No subprocesses waiting on you right now.
         </Typography>
       )}
       <Stack spacing={2}>
         {substeps.map((substep) => (
           <Card key={substep.Id} variant="outlined">
             <CardContent>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <Box>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    {substep.ProcessName} · {substep.StepTitle}
-                  </Typography>
-                  <Typography variant="body1">{substep.Title}</Typography>
-                </Box>
-                <Chip
-                  label={substep.Status}
-                  color={statusColor[substep.Status]}
-                  size="small"
-                />
-              </Box>
+              <Typography variant="subtitle2" color="text.secondary">
+                {substep.ProcessName} · {substep.StepTitle}
+              </Typography>
+              <Typography variant="body1">{substep.Title}</Typography>
               {substep.Description && (
                 <Typography
                   variant="body2"
@@ -239,17 +215,15 @@ export function MyTasks() {
                   {substep.Description}
                 </Typography>
               )}
-              {substep.Status === "PENDING" && (
-                <Button
-                  variant="contained"
-                  size="small"
-                  sx={{ mt: 2 }}
-                  disabled={busyId === substep.Id}
-                  onClick={() => handleCompleteSubstep(substep.Id)}
-                >
-                  {substep.ActionLabel}
-                </Button>
-              )}
+              <Button
+                variant="contained"
+                size="small"
+                sx={{ mt: 2 }}
+                disabled={busyId === substep.Id}
+                onClick={() => handleCompleteSubstep(substep.Id)}
+              >
+                {substep.ActionLabel}
+              </Button>
             </CardContent>
           </Card>
         ))}

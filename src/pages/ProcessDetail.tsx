@@ -45,8 +45,10 @@ export function ProcessDetail() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [detail, setDetail] = useState<ProcessDetailType | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
   const [starting, setStarting] = useState(false);
+  const [actioningId, setActioningId] = useState<string | null>(null);
 
   const load = useCallback(() => {
     if (!id) return;
@@ -54,7 +56,7 @@ export function ProcessDetail() {
       .get<ProcessDetailType>(`/processes/${id}`)
       .then((res) => setDetail(res.data))
       .catch((err) =>
-        setError(getApiErrorMessage(err, "Could not load process"))
+        setLoadError(getApiErrorMessage(err, "Could not load process"))
       );
   }, [id]);
 
@@ -64,6 +66,7 @@ export function ProcessDetail() {
 
   async function handleStart() {
     if (!id) return;
+    setActionError(null);
     setStarting(true);
     try {
       const res = await apiClient.post<ProcessDetailType>(
@@ -71,14 +74,59 @@ export function ProcessDetail() {
       );
       setDetail(res.data);
     } catch (err) {
-      setError(getApiErrorMessage(err, "Could not start process"));
+      setActionError(getApiErrorMessage(err, "Could not start process"));
     } finally {
       setStarting(false);
     }
   }
 
-  if (error) {
-    return <Alert severity="error">{error}</Alert>;
+  async function handleCompleteStep(stepId: string) {
+    setActionError(null);
+    setActioningId(stepId);
+    try {
+      const res = await apiClient.post<ProcessDetailType>(
+        `/process-steps/${stepId}/complete`
+      );
+      setDetail(res.data);
+    } catch (err) {
+      setActionError(getApiErrorMessage(err, "Could not complete step"));
+    } finally {
+      setActioningId(null);
+    }
+  }
+
+  async function handleRejectStep(stepId: string) {
+    setActionError(null);
+    setActioningId(stepId);
+    try {
+      const res = await apiClient.post<ProcessDetailType>(
+        `/process-steps/${stepId}/reject`
+      );
+      setDetail(res.data);
+    } catch (err) {
+      setActionError(getApiErrorMessage(err, "Could not reject step"));
+    } finally {
+      setActioningId(null);
+    }
+  }
+
+  async function handleCompleteSubstep(substepId: string) {
+    setActionError(null);
+    setActioningId(substepId);
+    try {
+      const res = await apiClient.post<ProcessDetailType>(
+        `/process-substeps/${substepId}/complete`
+      );
+      setDetail(res.data);
+    } catch (err) {
+      setActionError(getApiErrorMessage(err, "Could not complete subprocess"));
+    } finally {
+      setActioningId(null);
+    }
+  }
+
+  if (loadError) {
+    return <Alert severity="error">{loadError}</Alert>;
   }
 
   if (!detail) {
@@ -134,6 +182,12 @@ export function ProcessDetail() {
           )}
         </Stack>
       </Box>
+
+      {actionError && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {actionError}
+        </Alert>
+      )}
 
       <Stepper activeStep={activeStepIndex} alternativeLabel sx={{ mb: 3 }}>
         {steps.map((step) => (
@@ -208,9 +262,6 @@ export function ProcessDetail() {
                 Assignee: {step.AssigneeFirstName} {step.AssigneeLastName} (
                 {step.AssigneeEmail})
               </Typography>
-              <Typography variant="caption" color="text.secondary">
-                Action: {step.ActionLabel} · Completed {step.CompletionCount}x
-              </Typography>
 
               {step.substeps.length > 0 && (
                 <>
@@ -233,16 +284,76 @@ export function ProcessDetail() {
                           {substep.Title} — {substep.AssigneeFirstName}{" "}
                           {substep.AssigneeLastName}
                         </Typography>
-                        <Chip
-                          label={substep.Status}
-                          size="small"
-                          color={stepStatusColor[substep.Status]}
-                        />
+                        <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+                          {substep.Status === "PENDING" &&
+                            substep.AssigneeUserId === user?.id && (
+                              <Button
+                                variant="contained"
+                                size="small"
+                                disabled={actioningId === substep.Id}
+                                onClick={() =>
+                                  handleCompleteSubstep(substep.Id)
+                                }
+                              >
+                                {substep.ActionLabel}
+                              </Button>
+                            )}
+                          <Chip
+                            label={substep.Status}
+                            size="small"
+                            color={stepStatusColor[substep.Status]}
+                          />
+                        </Stack>
                       </Box>
                     ))}
                   </Stack>
                 </>
               )}
+
+              {process.Status === "ACTIVE" &&
+                process.CurrentStepId === step.Id &&
+                step.AssigneeUserId === user?.id && (
+                  <>
+                    <Divider sx={{ my: 1.5 }} />
+                    <Stack direction="row" spacing={1}>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        disabled={
+                          actioningId === step.Id ||
+                          step.substeps.some(
+                            (sub) => sub.Status !== "COMPLETED"
+                          )
+                        }
+                        onClick={() => handleCompleteStep(step.Id)}
+                      >
+                        {step.ActionLabel}
+                      </Button>
+                      {step.Position > 1 && (
+                        <Button
+                          variant="outlined"
+                          color="error"
+                          size="small"
+                          disabled={actioningId === step.Id}
+                          onClick={() => handleRejectStep(step.Id)}
+                        >
+                          Reject
+                        </Button>
+                      )}
+                    </Stack>
+                    {step.substeps.some(
+                      (sub) => sub.Status !== "COMPLETED"
+                    ) && (
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ display: "block", mt: 0.5 }}
+                      >
+                        All subprocesses must be completed first.
+                      </Typography>
+                    )}
+                  </>
+                )}
             </CardContent>
           </Card>
         ))}
