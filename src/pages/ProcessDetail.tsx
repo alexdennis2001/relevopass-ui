@@ -19,11 +19,15 @@ import {
 import { apiClient } from "../lib/apiClient";
 import { getApiErrorMessage } from "../lib/apiError";
 import { useAuth } from "../context/AuthContext";
+import { ElapsedDaysChip } from "../components/ElapsedDaysChip";
+import { RejectDialog } from "../components/RejectDialog";
 import type {
   ProcessDetail as ProcessDetailType,
   ProcessStatus,
   StepStatus,
 } from "../types/process";
+
+type RejectTarget = { type: "step" | "substep"; id: string };
 
 const processStatusColor: Record<
   ProcessStatus,
@@ -49,6 +53,7 @@ export function ProcessDetail() {
   const [actionError, setActionError] = useState<string | null>(null);
   const [starting, setStarting] = useState(false);
   const [actioningId, setActioningId] = useState<string | null>(null);
+  const [rejectTarget, setRejectTarget] = useState<RejectTarget | null>(null);
 
   const load = useCallback(() => {
     if (!id) return;
@@ -95,12 +100,13 @@ export function ProcessDetail() {
     }
   }
 
-  async function handleRejectStep(stepId: string) {
+  async function handleRejectStep(stepId: string, note: string) {
     setActionError(null);
     setActioningId(stepId);
     try {
       const res = await apiClient.post<ProcessDetailType>(
-        `/process-steps/${stepId}/reject`
+        `/process-steps/${stepId}/reject`,
+        { note }
       );
       setDetail(res.data);
     } catch (err) {
@@ -122,6 +128,32 @@ export function ProcessDetail() {
       setActionError(getApiErrorMessage(err, "Could not complete subprocess"));
     } finally {
       setActioningId(null);
+    }
+  }
+
+  async function handleRejectSubstep(substepId: string, note: string) {
+    setActionError(null);
+    setActioningId(substepId);
+    try {
+      const res = await apiClient.post<ProcessDetailType>(
+        `/process-substeps/${substepId}/reject`,
+        { note }
+      );
+      setDetail(res.data);
+    } catch (err) {
+      setActionError(getApiErrorMessage(err, "Could not reject subprocess"));
+    } finally {
+      setActioningId(null);
+    }
+  }
+
+  async function handleConfirmReject(note: string) {
+    if (!rejectTarget) return;
+    setRejectTarget(null);
+    if (rejectTarget.type === "step") {
+      await handleRejectStep(rejectTarget.id, note);
+    } else {
+      await handleRejectSubstep(rejectTarget.id, note);
     }
   }
 
@@ -243,11 +275,17 @@ export function ProcessDetail() {
                     />
                   )}
                 </Typography>
-                <Chip
-                  label={step.Status}
-                  size="small"
-                  color={stepStatusColor[step.Status]}
-                />
+                <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+                  <ElapsedDaysChip
+                    activatedAt={step.ActivatedAt}
+                    completedAt={step.CompletedAt}
+                  />
+                  <Chip
+                    label={step.Status}
+                    size="small"
+                    color={stepStatusColor[step.Status]}
+                  />
+                </Stack>
               </Box>
               {step.Description && (
                 <Typography
@@ -263,6 +301,12 @@ export function ProcessDetail() {
                 {step.AssigneeEmail})
               </Typography>
 
+              {step.RejectionNote && (
+                <Alert severity="warning" sx={{ mt: 1 }}>
+                  <strong>Rejected:</strong> {step.RejectionNote}
+                </Alert>
+              )}
+
               {step.substeps.length > 0 && (
                 <>
                   <Divider sx={{ my: 1.5 }} />
@@ -271,39 +315,70 @@ export function ProcessDetail() {
                   </Typography>
                   <Stack spacing={1}>
                     {step.substeps.map((substep) => (
-                      <Box
-                        key={substep.Id}
-                        sx={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          pl: 1,
-                        }}
-                      >
-                        <Typography variant="body2">
-                          {substep.Title} — {substep.AssigneeFirstName}{" "}
-                          {substep.AssigneeLastName}
-                        </Typography>
-                        <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
-                          {substep.Status === "PENDING" &&
-                            substep.AssigneeUserId === user?.id && (
-                              <Button
-                                variant="contained"
-                                size="small"
-                                disabled={actioningId === substep.Id}
-                                onClick={() =>
-                                  handleCompleteSubstep(substep.Id)
-                                }
-                              >
-                                {substep.ActionLabel}
-                              </Button>
-                            )}
-                          <Chip
-                            label={substep.Status}
-                            size="small"
-                            color={stepStatusColor[substep.Status]}
-                          />
-                        </Stack>
+                      <Box key={substep.Id} sx={{ pl: 1 }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                          }}
+                        >
+                          <Typography variant="body2">
+                            {substep.Title} — {substep.AssigneeFirstName}{" "}
+                            {substep.AssigneeLastName}
+                          </Typography>
+                          <Stack
+                            direction="row"
+                            spacing={1}
+                            sx={{ alignItems: "center" }}
+                          >
+                            {substep.Status === "PENDING" &&
+                              substep.AssigneeUserId === user?.id && (
+                                <Button
+                                  variant="contained"
+                                  size="small"
+                                  disabled={actioningId === substep.Id}
+                                  onClick={() =>
+                                    handleCompleteSubstep(substep.Id)
+                                  }
+                                >
+                                  {substep.ActionLabel}
+                                </Button>
+                              )}
+                            {substep.Status === "COMPLETED" &&
+                              step.AssigneeUserId === user?.id &&
+                              process.CurrentStepId === step.Id && (
+                                <Button
+                                  variant="outlined"
+                                  color="error"
+                                  size="small"
+                                  disabled={actioningId === substep.Id}
+                                  onClick={() =>
+                                    setRejectTarget({
+                                      type: "substep",
+                                      id: substep.Id,
+                                    })
+                                  }
+                                >
+                                  Reject
+                                </Button>
+                              )}
+                            <ElapsedDaysChip
+                              activatedAt={substep.ActivatedAt}
+                              completedAt={substep.CompletedAt}
+                            />
+                            <Chip
+                              label={substep.Status}
+                              size="small"
+                              color={stepStatusColor[substep.Status]}
+                            />
+                          </Stack>
+                        </Box>
+                        {substep.RejectionNote && (
+                          <Alert severity="warning" sx={{ mt: 0.5 }}>
+                            <strong>Rejected:</strong> {substep.RejectionNote}
+                          </Alert>
+                        )}
                       </Box>
                     ))}
                   </Stack>
@@ -335,7 +410,9 @@ export function ProcessDetail() {
                           color="error"
                           size="small"
                           disabled={actioningId === step.Id}
-                          onClick={() => handleRejectStep(step.Id)}
+                          onClick={() =>
+                            setRejectTarget({ type: "step", id: step.Id })
+                          }
                         >
                           Reject
                         </Button>
@@ -358,6 +435,23 @@ export function ProcessDetail() {
           </Card>
         ))}
       </Stack>
+
+      <RejectDialog
+        open={rejectTarget !== null}
+        title={
+          rejectTarget?.type === "step" ? "Reject step" : "Reject subprocess"
+        }
+        description={
+          rejectTarget?.type === "step"
+            ? "This will send the process back to the previous step. Let the previous assignee know what needs to be fixed."
+            : "This will send the subprocess back to its assignee. Let them know what needs to be fixed."
+        }
+        submitting={
+          rejectTarget !== null && actioningId === rejectTarget.id
+        }
+        onCancel={() => setRejectTarget(null)}
+        onConfirm={handleConfirmReject}
+      />
     </Box>
   );
 }

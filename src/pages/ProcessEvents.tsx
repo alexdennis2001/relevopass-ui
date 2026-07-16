@@ -24,8 +24,19 @@ const eventTypeLabels: Record<string, string> = {
   STEP_COMPLETED: "Step completed",
   STEP_REJECTED: "Step rejected",
   SUBSTEP_COMPLETED: "Subprocess completed",
+  SUBSTEP_REJECTED: "Subprocess rejected",
   PROCESS_COMPLETED: "Process completed",
 };
+
+function getRejectionNote(metadata: string | null): string | null {
+  if (!metadata) return null;
+  try {
+    const parsed = JSON.parse(metadata);
+    return typeof parsed.note === "string" ? parsed.note : null;
+  } catch {
+    return null;
+  }
+}
 
 export function ProcessEvents() {
   const { id } = useParams<{ id: string }>();
@@ -69,19 +80,31 @@ export function ProcessEvents() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {events.map((event) => (
-              <TableRow key={event.Id}>
-                <TableCell>
-                  {new Date(event.CreatedAt).toLocaleString()}
-                </TableCell>
-                <TableCell>
-                  {eventTypeLabels[event.EventType] ?? event.EventType}
-                </TableCell>
-                <TableCell>
-                  {event.ActorFirstName} {event.ActorLastName}
-                </TableCell>
-              </TableRow>
-            ))}
+            {events.map((event) => {
+              const note = getRejectionNote(event.Metadata);
+              return (
+                <TableRow key={event.Id}>
+                  <TableCell>
+                    {new Date(event.CreatedAt).toLocaleString()}
+                  </TableCell>
+                  <TableCell>
+                    {eventTypeLabels[event.EventType] ?? event.EventType}
+                    {note && (
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ display: "block" }}
+                      >
+                        “{note}”
+                      </Typography>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {event.ActorFirstName} {event.ActorLastName}
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </TableContainer>

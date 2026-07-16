@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Alert,
   Avatar,
   Box,
@@ -12,6 +15,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { apiClient } from "../lib/apiClient";
 import { getApiErrorMessage } from "../lib/apiError";
 import { useAuth } from "../context/AuthContext";
@@ -42,6 +46,59 @@ export function Dashboard() {
     return null;
   }
 
+  const activeProcesses = processes?.filter((p) => p.Status !== "COMPLETED");
+  const completedProcesses = processes?.filter(
+    (p) => p.Status === "COMPLETED"
+  );
+
+  function renderProcessCard(process: Process) {
+    return (
+      <Card
+        key={process.Id}
+        variant="outlined"
+        sx={{ width: 280, flex: "0 0 auto" }}
+      >
+        <CardActionArea onClick={() => navigate(`/processes/${process.Id}`)}>
+          <CardContent>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "flex-start",
+                gap: 1,
+              }}
+            >
+              <Box sx={{ minWidth: 0 }}>
+                <Typography variant="subtitle1" noWrap>
+                  {process.Name}
+                </Typography>
+                {process.Description && (
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{
+                      display: "-webkit-box",
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: "vertical",
+                      overflow: "hidden",
+                    }}
+                  >
+                    {process.Description}
+                  </Typography>
+                )}
+              </Box>
+              <Chip
+                label={process.Status}
+                color={statusColor[process.Status]}
+                size="small"
+              />
+            </Box>
+          </CardContent>
+        </CardActionArea>
+      </Card>
+    );
+  }
+
   return (
     <Box>
       <Card sx={{ mb: 3 }}>
@@ -68,10 +125,6 @@ export function Dashboard() {
         </CardContent>
       </Card>
 
-      <Typography variant="h6" sx={{ mb: 2 }}>
-        My Processes
-      </Typography>
-
       {error && <Alert severity="error">{error}</Alert>}
 
       {!processes && !error && (
@@ -80,47 +133,58 @@ export function Dashboard() {
         </Box>
       )}
 
-      {processes && processes.length === 0 && (
-        <Typography color="text.secondary">
-          You're not involved in any processes yet.
-        </Typography>
-      )}
+      {processes && (
+        <>
+          <Typography variant="h6" sx={{ mb: 2 }}>
+            My Processes
+          </Typography>
 
-      <Stack spacing={2}>
-        {processes?.map((process) => (
-          <Card key={process.Id} variant="outlined">
-            <CardActionArea
-              onClick={() => navigate(`/processes/${process.Id}`)}
+          {activeProcesses && activeProcesses.length === 0 && (
+            <Typography color="text.secondary" sx={{ mb: 3 }}>
+              You're not involved in any active processes yet.
+            </Typography>
+          )}
+
+          {activeProcesses && activeProcesses.length > 0 && (
+            <Box
+              sx={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: 2,
+                mb: 3,
+              }}
             >
-              <CardContent>
+              {activeProcesses.map(renderProcessCard)}
+            </Box>
+          )}
+
+          <Accordion>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography variant="h6">
+                Completed Processes ({completedProcesses?.length ?? 0})
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              {completedProcesses && completedProcesses.length === 0 && (
+                <Typography color="text.secondary">
+                  No completed processes yet.
+                </Typography>
+              )}
+              {completedProcesses && completedProcesses.length > 0 && (
                 <Box
                   sx={{
                     display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
+                    flexWrap: "wrap",
+                    gap: 2,
                   }}
                 >
-                  <Box>
-                    <Typography variant="subtitle1">
-                      {process.Name}
-                    </Typography>
-                    {process.Description && (
-                      <Typography variant="body2" color="text.secondary">
-                        {process.Description}
-                      </Typography>
-                    )}
-                  </Box>
-                  <Chip
-                    label={process.Status}
-                    color={statusColor[process.Status]}
-                    size="small"
-                  />
+                  {completedProcesses.map(renderProcessCard)}
                 </Box>
-              </CardContent>
-            </CardActionArea>
-          </Card>
-        ))}
-      </Stack>
+              )}
+            </AccordionDetails>
+          </Accordion>
+        </>
+      )}
     </Box>
   );
 }

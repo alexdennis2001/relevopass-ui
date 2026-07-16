@@ -11,6 +11,8 @@ import {
 } from "@mui/material";
 import { apiClient } from "../lib/apiClient";
 import { getApiErrorMessage } from "../lib/apiError";
+import { ElapsedDaysChip } from "../components/ElapsedDaysChip";
+import { RejectDialog } from "../components/RejectDialog";
 
 type IncompleteSubstepInfo = {
   Title: string;
@@ -27,6 +29,9 @@ type MyStepTask = {
   Description: string | null;
   ActionLabel: string;
   CompletionCount: number;
+  ActivatedAt: string | null;
+  CompletedAt: string | null;
+  RejectionNote: string | null;
   TotalSubsteps: number;
   incompleteSubsteps: IncompleteSubstepInfo[];
 };
@@ -41,6 +46,9 @@ type MySubstepTask = {
   Description: string | null;
   ActionLabel: string;
   CompletionCount: number;
+  ActivatedAt: string | null;
+  CompletedAt: string | null;
+  RejectionNote: string | null;
 };
 
 export function MyTasks() {
@@ -49,6 +57,7 @@ export function MyTasks() {
   const [error, setError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [rejectStepId, setRejectStepId] = useState<string | null>(null);
 
   const load = useCallback(() => {
     apiClient
@@ -79,11 +88,11 @@ export function MyTasks() {
     }
   }
 
-  async function handleRejectStep(stepId: string) {
+  async function handleRejectStep(stepId: string, note: string) {
     setActionError(null);
     setBusyId(stepId);
     try {
-      await apiClient.post(`/process-steps/${stepId}/reject`);
+      await apiClient.post(`/process-steps/${stepId}/reject`, { note });
       load();
     } catch (err) {
       setActionError(getApiErrorMessage(err, "Could not reject step"));
@@ -143,12 +152,26 @@ export function MyTasks() {
           return (
             <Card key={step.Id} variant="outlined">
               <CardContent>
-                <Typography variant="subtitle2" color="text.secondary">
-                  {step.ProcessName}
-                </Typography>
-                <Typography variant="body1">
-                  Step {step.Position}: {step.Title}
-                </Typography>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <Box>
+                    <Typography variant="subtitle2" color="text.secondary">
+                      {step.ProcessName}
+                    </Typography>
+                    <Typography variant="body1">
+                      Step {step.Position}: {step.Title}
+                    </Typography>
+                  </Box>
+                  <ElapsedDaysChip
+                    activatedAt={step.ActivatedAt}
+                    completedAt={step.CompletedAt}
+                  />
+                </Box>
                 {step.Description && (
                   <Typography
                     variant="body2"
@@ -157,6 +180,11 @@ export function MyTasks() {
                   >
                     {step.Description}
                   </Typography>
+                )}
+                {step.RejectionNote && (
+                  <Alert severity="warning" sx={{ mt: 1 }}>
+                    <strong>Rejected:</strong> {step.RejectionNote}
+                  </Alert>
                 )}
                 <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
                   <Button
@@ -173,7 +201,7 @@ export function MyTasks() {
                       color="error"
                       size="small"
                       disabled={busyId === step.Id}
-                      onClick={() => handleRejectStep(step.Id)}
+                      onClick={() => setRejectStepId(step.Id)}
                     >
                       Reject
                     </Button>
@@ -222,10 +250,24 @@ export function MyTasks() {
         {substeps.map((substep) => (
           <Card key={substep.Id} variant="outlined">
             <CardContent>
-              <Typography variant="subtitle2" color="text.secondary">
-                {substep.ProcessName} · {substep.StepTitle}
-              </Typography>
-              <Typography variant="body1">{substep.Title}</Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <Box>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    {substep.ProcessName} · {substep.StepTitle}
+                  </Typography>
+                  <Typography variant="body1">{substep.Title}</Typography>
+                </Box>
+                <ElapsedDaysChip
+                  activatedAt={substep.ActivatedAt}
+                  completedAt={substep.CompletedAt}
+                />
+              </Box>
               {substep.Description && (
                 <Typography
                   variant="body2"
@@ -234,6 +276,11 @@ export function MyTasks() {
                 >
                   {substep.Description}
                 </Typography>
+              )}
+              {substep.RejectionNote && (
+                <Alert severity="warning" sx={{ mt: 1 }}>
+                  <strong>Rejected:</strong> {substep.RejectionNote}
+                </Alert>
               )}
               <Button
                 variant="contained"
@@ -248,6 +295,19 @@ export function MyTasks() {
           </Card>
         ))}
       </Stack>
+
+      <RejectDialog
+        open={rejectStepId !== null}
+        title="Reject step"
+        description="This will send the process back to the previous step. Let the previous assignee know what needs to be fixed."
+        submitting={false}
+        onCancel={() => setRejectStepId(null)}
+        onConfirm={(note) => {
+          const stepId = rejectStepId;
+          setRejectStepId(null);
+          if (stepId) handleRejectStep(stepId, note);
+        }}
+      />
     </Box>
   );
 }

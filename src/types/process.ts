@@ -38,6 +38,7 @@ export type ProcessSubstep = {
   ActivatedAt: string | null;
   CompletedAt: string | null;
   CompletedByUserId: string | null;
+  RejectionNote: string | null;
 };
 
 export type ProcessStep = {
@@ -56,6 +57,7 @@ export type ProcessStep = {
   ActivatedAt: string | null;
   CompletedAt: string | null;
   CompletedByUserId: string | null;
+  RejectionNote: string | null;
   substeps: ProcessSubstep[];
 };
 
