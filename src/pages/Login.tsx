@@ -6,11 +6,15 @@ import {
   Box,
   Button,
   Container,
+  IconButton,
+  InputAdornment,
   Link,
   Paper,
   TextField,
   Typography,
 } from "@mui/material";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useAuth } from "../context/AuthContext";
 import { getApiErrorMessage } from "../lib/apiError";
 
@@ -19,6 +23,7 @@ export function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -60,11 +65,29 @@ export function Login() {
             />
             <TextField
               label="Password"
-              type="password"
+              type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
               fullWidth
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        type="button"
+                        onClick={() => setShowPassword((prev) => !prev)}
+                        edge="end"
+                        aria-label={
+                          showPassword ? "Hide password" : "Show password"
+                        }
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
+              }}
             />
             <Button
               type="submit"
