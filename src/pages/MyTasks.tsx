@@ -12,6 +12,12 @@ import {
 import { apiClient } from "../lib/apiClient";
 import { getApiErrorMessage } from "../lib/apiError";
 
+type IncompleteSubstepInfo = {
+  Title: string;
+  AssigneeFirstName: string;
+  AssigneeLastName: string;
+};
+
 type MyStepTask = {
   Id: string;
   ProcessId: string;
@@ -22,7 +28,7 @@ type MyStepTask = {
   ActionLabel: string;
   CompletionCount: number;
   TotalSubsteps: number;
-  CompletedSubsteps: number;
+  incompleteSubsteps: IncompleteSubstepInfo[];
 };
 
 type MySubstepTask = {
@@ -133,7 +139,7 @@ export function MyTasks() {
       )}
       <Stack spacing={2} sx={{ mb: 3 }}>
         {steps.map((step) => {
-          const blocked = step.CompletedSubsteps < step.TotalSubsteps;
+          const blocked = step.incompleteSubsteps.length > 0;
           return (
             <Card key={step.Id} variant="outlined">
               <CardContent>
@@ -174,15 +180,29 @@ export function MyTasks() {
                   )}
                 </Stack>
                 {blocked && (
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={{ display: "block", mt: 0.5 }}
-                  >
-                    Waiting on {step.TotalSubsteps - step.CompletedSubsteps}{" "}
-                    of {step.TotalSubsteps} subprocesses to be completed
-                    before this can be approved.
-                  </Typography>
+                  <Box sx={{ mt: 1 }}>
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ display: "block" }}
+                    >
+                      Waiting on {step.incompleteSubsteps.length} of{" "}
+                      {step.TotalSubsteps} subprocesses to be completed
+                      before this can be approved:
+                    </Typography>
+                    <Stack sx={{ pl: 1 }}>
+                      {step.incompleteSubsteps.map((sub, i) => (
+                        <Typography
+                          key={i}
+                          variant="caption"
+                          color="text.secondary"
+                        >
+                          • {sub.Title} — {sub.AssigneeFirstName}{" "}
+                          {sub.AssigneeLastName}
+                        </Typography>
+                      ))}
+                    </Stack>
+                  </Box>
                 )}
               </CardContent>
             </Card>
