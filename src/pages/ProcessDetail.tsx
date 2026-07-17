@@ -23,6 +23,7 @@ import { getApiErrorMessage } from "../lib/apiError";
 import { useAuth } from "../context/AuthContext";
 import { ElapsedDaysChip } from "../components/ElapsedDaysChip";
 import { RejectDialog } from "../components/RejectDialog";
+import { SaveTemplateDialog } from "../components/SaveTemplateDialog";
 import type {
   ProcessDetail as ProcessDetailType,
   ProcessStatus,
@@ -58,6 +59,9 @@ export function ProcessDetail() {
   const [starting, setStarting] = useState(false);
   const [actioningId, setActioningId] = useState<string | null>(null);
   const [rejectTarget, setRejectTarget] = useState<RejectTarget | null>(null);
+  const [saveTemplateOpen, setSaveTemplateOpen] = useState(false);
+  const [savingTemplate, setSavingTemplate] = useState(false);
+  const [templateMessage, setTemplateMessage] = useState<string | null>(null);
 
   const load = useCallback(() => {
     if (!id) return;
@@ -161,6 +165,21 @@ export function ProcessDetail() {
     }
   }
 
+  async function handleSaveTemplate(name: string) {
+    if (!id) return;
+    setSavingTemplate(true);
+    setActionError(null);
+    try {
+      await apiClient.post("/process-templates", { processId: id, name });
+      setSaveTemplateOpen(false);
+      setTemplateMessage(`Saved as template "${name}".`);
+    } catch (err) {
+      setActionError(getApiErrorMessage(err, "Could not save template"));
+    } finally {
+      setSavingTemplate(false);
+    }
+  }
+
   if (loadError) {
     return <Alert severity="error">{loadError}</Alert>;
   }
@@ -223,8 +242,26 @@ export function ProcessDetail() {
               </Button>
             </>
           )}
+          {process.CreatedByUserId === user?.id && user?.role === "ADMIN" && (
+            <Button
+              variant="outlined"
+              onClick={() => setSaveTemplateOpen(true)}
+            >
+              Save as Template
+            </Button>
+          )}
         </Stack>
       </Box>
+
+      {templateMessage && (
+        <Alert
+          severity="success"
+          sx={{ mb: 2 }}
+          onClose={() => setTemplateMessage(null)}
+        >
+          {templateMessage}
+        </Alert>
+      )}
 
       {actionError && (
         <Alert severity="error" sx={{ mb: 2 }}>
@@ -482,6 +519,13 @@ export function ProcessDetail() {
         }
         onCancel={() => setRejectTarget(null)}
         onConfirm={handleConfirmReject}
+      />
+
+      <SaveTemplateDialog
+        open={saveTemplateOpen}
+        submitting={savingTemplate}
+        onCancel={() => setSaveTemplateOpen(false)}
+        onConfirm={handleSaveTemplate}
       />
     </Box>
   );
