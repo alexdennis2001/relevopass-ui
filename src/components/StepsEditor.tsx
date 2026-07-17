@@ -227,7 +227,12 @@ export function StepsEditor({
               {step.substeps.map((substep, substepIndex) => (
                 <Box
                   key={substep._key}
-                  sx={{ display: "flex", gap: 1, alignItems: "flex-start" }}
+                  sx={{
+                    display: "flex",
+                    flexDirection: { xs: "column", sm: "row" },
+                    gap: 1,
+                    alignItems: { xs: "stretch", sm: "flex-start" },
+                  }}
                 >
                   <TextField
                     label="Title"
@@ -241,33 +246,35 @@ export function StepsEditor({
                     required
                     sx={{ flex: 1 }}
                   />
-                  <TextField
-                    select
-                    label="Assignee"
-                    size="small"
-                    value={substep.assigneeUserId}
-                    onChange={(e) =>
-                      updateSubstep(stepIndex, substepIndex, {
-                        assigneeUserId: e.target.value,
-                      })
-                    }
-                    required
-                    sx={{ flex: 1 }}
-                  >
-                    {users.map((u) => (
-                      <MenuItem key={u.id} value={u.id}>
-                        {u.firstName} {u.lastName}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                  <IconButton
-                    type="button"
-                    size="small"
-                    onClick={() => removeSubstep(stepIndex, substepIndex)}
-                    aria-label="Remove subprocess"
-                  >
-                    <DeleteIcon fontSize="small" />
-                  </IconButton>
+                  <Box sx={{ display: "flex", gap: 1, alignItems: "flex-start" }}>
+                    <TextField
+                      select
+                      label="Assignee"
+                      size="small"
+                      value={substep.assigneeUserId}
+                      onChange={(e) =>
+                        updateSubstep(stepIndex, substepIndex, {
+                          assigneeUserId: e.target.value,
+                        })
+                      }
+                      required
+                      sx={{ flex: 1 }}
+                    >
+                      {users.map((u) => (
+                        <MenuItem key={u.id} value={u.id}>
+                          {u.firstName} {u.lastName}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                    <IconButton
+                      type="button"
+                      size="small"
+                      onClick={() => removeSubstep(stepIndex, substepIndex)}
+                      aria-label="Remove subprocess"
+                    >
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
                 </Box>
               ))}
             </Stack>

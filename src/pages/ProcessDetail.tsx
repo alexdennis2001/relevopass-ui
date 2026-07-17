@@ -15,6 +15,8 @@ import {
   StepLabel,
   Stepper,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { apiClient } from "../lib/apiClient";
 import { getApiErrorMessage } from "../lib/apiError";
@@ -48,6 +50,8 @@ export function ProcessDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [detail, setDetail] = useState<ProcessDetailType | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -179,12 +183,14 @@ export function ProcessDetail() {
       <Box
         sx={{
           display: "flex",
+          flexDirection: { xs: "column", sm: "row" },
           justifyContent: "space-between",
-          alignItems: "flex-start",
+          alignItems: { xs: "flex-start", sm: "flex-start" },
+          gap: 2,
           mb: 2,
         }}
       >
-        <Box>
+        <Box sx={{ minWidth: 0 }}>
           <Typography variant="h5" component="h1">
             {process.Name}
           </Typography>
@@ -194,7 +200,12 @@ export function ProcessDetail() {
             </Typography>
           )}
         </Box>
-        <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+        <Stack
+          direction="row"
+          spacing={1}
+          useFlexGap
+          sx={{ alignItems: "center", flexWrap: "wrap" }}
+        >
           <Chip
             label={process.Status}
             color={processStatusColor[process.Status]}
@@ -221,7 +232,12 @@ export function ProcessDetail() {
         </Alert>
       )}
 
-      <Stepper activeStep={activeStepIndex} alternativeLabel sx={{ mb: 3 }}>
+      <Stepper
+        activeStep={activeStepIndex}
+        orientation={isMobile ? "vertical" : "horizontal"}
+        alternativeLabel={!isMobile}
+        sx={{ mb: 3 }}
+      >
         {steps.map((step) => (
           <Step key={step.Id} completed={step.Status === "COMPLETED"}>
             <StepLabel
@@ -260,8 +276,10 @@ export function ProcessDetail() {
               <Box
                 sx={{
                   display: "flex",
+                  flexWrap: "wrap",
                   justifyContent: "space-between",
                   alignItems: "center",
+                  gap: 1,
                 }}
               >
                 <Typography variant="subtitle1">
@@ -275,7 +293,12 @@ export function ProcessDetail() {
                     />
                   )}
                 </Typography>
-                <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  useFlexGap
+                  sx={{ alignItems: "center", flexWrap: "wrap" }}
+                >
                   <ElapsedDaysChip
                     activatedAt={step.ActivatedAt}
                     completedAt={step.CompletedAt}
@@ -319,8 +342,10 @@ export function ProcessDetail() {
                         <Box
                           sx={{
                             display: "flex",
+                            flexWrap: "wrap",
                             justifyContent: "space-between",
                             alignItems: "center",
+                            gap: 1,
                           }}
                         >
                           <Typography variant="body2">
@@ -330,7 +355,8 @@ export function ProcessDetail() {
                           <Stack
                             direction="row"
                             spacing={1}
-                            sx={{ alignItems: "center" }}
+                            useFlexGap
+                            sx={{ alignItems: "center", flexWrap: "wrap" }}
                           >
                             {substep.Status === "PENDING" &&
                               substep.AssigneeUserId === user?.id && (
@@ -390,7 +416,12 @@ export function ProcessDetail() {
                 step.AssigneeUserId === user?.id && (
                   <>
                     <Divider sx={{ my: 1.5 }} />
-                    <Stack direction="row" spacing={1}>
+                    <Stack
+                      direction="row"
+                      spacing={1}
+                      useFlexGap
+                      sx={{ flexWrap: "wrap" }}
+                    >
                       <Button
                         variant="contained"
                         size="small"

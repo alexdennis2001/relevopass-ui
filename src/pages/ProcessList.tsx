@@ -4,9 +4,13 @@ import {
   Alert,
   Box,
   Button,
+  Card,
+  CardActionArea,
+  CardContent,
   Chip,
   CircularProgress,
   Paper,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -14,6 +18,8 @@ import {
   TableHead,
   TableRow,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { apiClient } from "../lib/apiClient";
 import { getApiErrorMessage } from "../lib/apiError";
@@ -29,6 +35,8 @@ export function ProcessList() {
   const [processes, setProcesses] = useState<Process[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   useEffect(() => {
     apiClient
@@ -44,8 +52,10 @@ export function ProcessList() {
       <Box
         sx={{
           display: "flex",
+          flexWrap: "wrap",
           justifyContent: "space-between",
           alignItems: "center",
+          gap: 1,
           mb: 2,
         }}
       >
@@ -69,7 +79,46 @@ export function ProcessList() {
         <Typography color="text.secondary">No processes yet.</Typography>
       )}
 
-      {processes && processes.length > 0 && (
+      {processes && processes.length > 0 && isMobile && (
+        <Stack spacing={1.5}>
+          {processes.map((process) => (
+            <Card key={process.Id} variant="outlined">
+              <CardActionArea
+                onClick={() => navigate(`/processes/${process.Id}`)}
+              >
+                <CardContent>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "flex-start",
+                      gap: 1,
+                    }}
+                  >
+                    <Typography variant="subtitle1" sx={{ minWidth: 0 }}>
+                      {process.Name}
+                    </Typography>
+                    <Chip
+                      label={process.Status}
+                      color={statusColor[process.Status]}
+                      size="small"
+                    />
+                  </Box>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ display: "block", mt: 0.5 }}
+                  >
+                    {new Date(process.CreatedAt).toLocaleString()}
+                  </Typography>
+                </CardContent>
+              </CardActionArea>
+            </Card>
+          ))}
+        </Stack>
+      )}
+
+      {processes && processes.length > 0 && !isMobile && (
         <TableContainer component={Paper}>
           <Table>
             <TableHead>

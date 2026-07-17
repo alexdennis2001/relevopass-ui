@@ -56,7 +56,7 @@ export function Dashboard() {
       <Card
         key={process.Id}
         variant="outlined"
-        sx={{ width: 280, flex: "0 0 auto" }}
+        sx={{ flex: "1 1 280px", maxWidth: { xs: "100%", sm: 320 } }}
       >
         <CardActionArea onClick={() => navigate(`/processes/${process.Id}`)}>
           <CardContent>
@@ -104,22 +104,22 @@ export function Dashboard() {
       <Card sx={{ mb: 3 }}>
         <CardContent>
           <Stack direction="row" spacing={2} sx={{ alignItems: "center" }}>
-            <Avatar sx={{ bgcolor: "primary.main" }}>
+            <Avatar sx={{ bgcolor: "primary.main", flexShrink: 0 }}>
               {user.firstName[0]}
               {user.lastName[0]}
             </Avatar>
-            <Box>
-              <Typography variant="h6">
+            <Box sx={{ minWidth: 0, flex: 1 }}>
+              <Typography variant="h6" noWrap>
                 {user.firstName} {user.lastName}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" color="text.secondary" noWrap>
                 {user.email}
               </Typography>
             </Box>
             <Chip
               label={user.role}
               color={user.role === "ADMIN" ? "secondary" : "default"}
-              sx={{ ml: "auto" }}
+              sx={{ ml: "auto", flexShrink: 0 }}
             />
           </Stack>
         </CardContent>

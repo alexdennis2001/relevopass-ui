@@ -155,11 +155,13 @@ export function MyTasks() {
                 <Box
                   sx={{
                     display: "flex",
+                    flexWrap: "wrap",
                     justifyContent: "space-between",
                     alignItems: "center",
+                    gap: 1,
                   }}
                 >
-                  <Box>
+                  <Box sx={{ minWidth: 0, flex: 1 }}>
                     <Typography variant="subtitle2" color="text.secondary">
                       {step.ProcessName}
                     </Typography>
@@ -253,11 +255,13 @@ export function MyTasks() {
               <Box
                 sx={{
                   display: "flex",
+                  flexWrap: "wrap",
                   justifyContent: "space-between",
                   alignItems: "center",
+                  gap: 1,
                 }}
               >
-                <Box>
+                <Box sx={{ minWidth: 0, flex: 1 }}>
                   <Typography variant="subtitle2" color="text.secondary">
                     {substep.ProcessName} · {substep.StepTitle}
                   </Typography>
