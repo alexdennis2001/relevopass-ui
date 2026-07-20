@@ -12,7 +12,6 @@ import {
   ListItemIcon,
   ListItemText,
   Toolbar,
-  Typography,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import DashboardIcon from "@mui/icons-material/Dashboard";
@@ -21,6 +20,8 @@ import AssignmentIcon from "@mui/icons-material/Assignment";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { Link as RouterLink, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import logoBlanco from "../assets/logo-blanco.png";
+import logoVerde from "../assets/logo-verde.png";
 
 const DRAWER_WIDTH = 260;
 
@@ -43,9 +44,12 @@ export function Layout() {
   const drawerContent = (
     <Box sx={{ width: DRAWER_WIDTH }} role="presentation">
       <Toolbar>
-        <Typography variant="h6" component="div">
-          RelevoPass
-        </Typography>
+        <Box
+          component="img"
+          src={logoVerde}
+          alt="RelevoPass"
+          sx={{ height: 40, width: "auto" }}
+        />
       </Toolbar>
       <Divider />
       <List>
@@ -92,9 +96,14 @@ export function Layout() {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            RelevoPass
-          </Typography>
+          <Box sx={{ flexGrow: 1, display: "flex", alignItems: "center" }}>
+            <Box
+              component="img"
+              src={logoBlanco}
+              alt="RelevoPass"
+              sx={{ height: { xs: 28, md: 32 }, width: "auto" }}
+            />
+          </Box>
           <Box sx={{ display: { xs: "none", md: "flex" }, gap: 1 }}>
             {navItems.map((item) => (
               <Button
