@@ -100,6 +100,11 @@ export function Login() {
               {submitting ? "Iniciando sesión..." : "Iniciar sesión"}
             </Button>
             <Typography variant="body2" align="center">
+              <Link component={RouterLink} to="/forgot-password">
+                ¿Olvidaste tu contraseña?
+              </Link>
+            </Typography>
+            <Typography variant="body2" align="center">
               ¿No tienes una cuenta?{" "}
               <Link component={RouterLink} to="/register">
                 Regístrate

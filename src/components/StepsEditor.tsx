@@ -244,9 +244,16 @@ export function StepsEditor({
                       })
                     }
                     required
-                    sx={{ flex: 1 }}
+                    sx={{ flex: "1 1 70%" }}
                   />
-                  <Box sx={{ display: "flex", gap: 1, alignItems: "flex-start" }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      gap: 1,
+                      alignItems: "flex-start",
+                      flex: "1 1 30%",
+                    }}
+                  >
                     <TextField
                       select
                       label="Asignado"
@@ -262,7 +269,7 @@ export function StepsEditor({
                     >
                       {users.map((u) => (
                         <MenuItem key={u.id} value={u.id}>
-                          {u.firstName} {u.lastName}
+                          {u.firstName} {u.lastName} ({u.email})
                         </MenuItem>
                       ))}
                     </TextField>

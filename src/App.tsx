@@ -5,8 +5,10 @@ import { AuthProvider } from "./context/AuthContext";
 import { CreateProcess } from "./pages/CreateProcess";
 import { Dashboard } from "./pages/Dashboard";
 import { EditProcess } from "./pages/EditProcess";
+import { ForgotPassword } from "./pages/ForgotPassword";
 import { Login } from "./pages/Login";
 import { MyTasks } from "./pages/MyTasks";
+import { ResetPassword } from "./pages/ResetPassword";
 import { ProcessDetail } from "./pages/ProcessDetail";
 import { ProcessEvents } from "./pages/ProcessEvents";
 import { ProcessList } from "./pages/ProcessList";
@@ -19,6 +21,8 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route
             element={
               <RequireAuth>
