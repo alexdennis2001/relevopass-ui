@@ -67,7 +67,7 @@ export function MyTasks() {
         setSubsteps(res.data.substeps);
       })
       .catch((err) =>
-        setError(getApiErrorMessage(err, "Could not load your tasks"))
+        setError(getApiErrorMessage(err, "No se pudieron cargar tus tareas"))
       );
   }, []);
 
@@ -82,7 +82,7 @@ export function MyTasks() {
       await apiClient.post(`/process-steps/${stepId}/complete`);
       load();
     } catch (err) {
-      setActionError(getApiErrorMessage(err, "Could not complete step"));
+      setActionError(getApiErrorMessage(err, "No se pudo completar el paso"));
     } finally {
       setBusyId(null);
     }
@@ -95,7 +95,7 @@ export function MyTasks() {
       await apiClient.post(`/process-steps/${stepId}/reject`, { note });
       load();
     } catch (err) {
-      setActionError(getApiErrorMessage(err, "Could not reject step"));
+      setActionError(getApiErrorMessage(err, "No se pudo rechazar el paso"));
     } finally {
       setBusyId(null);
     }
@@ -108,7 +108,7 @@ export function MyTasks() {
       await apiClient.post(`/process-substeps/${substepId}/complete`);
       load();
     } catch (err) {
-      setActionError(getApiErrorMessage(err, "Could not complete subprocess"));
+      setActionError(getApiErrorMessage(err, "No se pudo completar el subproceso"));
     } finally {
       setBusyId(null);
     }
@@ -129,7 +129,7 @@ export function MyTasks() {
   return (
     <Box>
       <Typography variant="h5" component="h1" gutterBottom>
-        My Tasks
+        Mis Tareas
       </Typography>
 
       {actionError && (
@@ -139,11 +139,11 @@ export function MyTasks() {
       )}
 
       <Typography variant="subtitle1" sx={{ mt: 2, mb: 1 }}>
-        Steps
+        Pasos
       </Typography>
       {steps.length === 0 && (
         <Typography color="text.secondary">
-          Nothing waiting on your approval right now.
+          No hay nada esperando tu aprobación en este momento.
         </Typography>
       )}
       <Stack spacing={2} sx={{ mb: 3 }}>
@@ -166,7 +166,7 @@ export function MyTasks() {
                       {step.ProcessName}
                     </Typography>
                     <Typography variant="body1">
-                      Step {step.Position}: {step.Title}
+                      Paso {step.Position}: {step.Title}
                     </Typography>
                   </Box>
                   <ElapsedDaysChip
@@ -185,7 +185,7 @@ export function MyTasks() {
                 )}
                 {step.RejectionNote && (
                   <Alert severity="warning" sx={{ mt: 1 }}>
-                    <strong>Rejected:</strong> {step.RejectionNote}
+                    <strong>Rechazado:</strong> {step.RejectionNote}
                   </Alert>
                 )}
                 <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
@@ -205,7 +205,7 @@ export function MyTasks() {
                       disabled={busyId === step.Id}
                       onClick={() => setRejectStepId(step.Id)}
                     >
-                      Reject
+                      Rechazar
                     </Button>
                   )}
                 </Stack>
@@ -216,9 +216,9 @@ export function MyTasks() {
                       color="text.secondary"
                       sx={{ display: "block" }}
                     >
-                      Waiting on {step.incompleteSubsteps.length} of{" "}
-                      {step.TotalSubsteps} subprocesses to be completed
-                      before this can be approved:
+                      Esperando {step.incompleteSubsteps.length} de{" "}
+                      {step.TotalSubsteps} subprocesos por completar antes de
+                      poder aprobar esto:
                     </Typography>
                     <Stack sx={{ pl: 1 }}>
                       {step.incompleteSubsteps.map((sub, i) => (
@@ -241,11 +241,11 @@ export function MyTasks() {
       </Stack>
 
       <Typography variant="subtitle1" sx={{ mt: 2, mb: 1 }}>
-        Subprocesses
+        Subprocesos
       </Typography>
       {substeps.length === 0 && (
         <Typography color="text.secondary">
-          No subprocesses waiting on you right now.
+          No hay subprocesos esperándote en este momento.
         </Typography>
       )}
       <Stack spacing={2}>
@@ -283,7 +283,7 @@ export function MyTasks() {
               )}
               {substep.RejectionNote && (
                 <Alert severity="warning" sx={{ mt: 1 }}>
-                  <strong>Rejected:</strong> {substep.RejectionNote}
+                  <strong>Rechazado:</strong> {substep.RejectionNote}
                 </Alert>
               )}
               <Button
@@ -302,8 +302,8 @@ export function MyTasks() {
 
       <RejectDialog
         open={rejectStepId !== null}
-        title="Reject step"
-        description="This will send the process back to the previous step. Let the previous assignee know what needs to be fixed."
+        title="Rechazar paso"
+        description="Esto enviará el proceso de vuelta al paso anterior."
         submitting={false}
         onCancel={() => setRejectStepId(null)}
         onConfirm={(note) => {

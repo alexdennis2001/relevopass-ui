@@ -23,6 +23,7 @@ import {
 } from "@mui/material";
 import { apiClient } from "../lib/apiClient";
 import { getApiErrorMessage } from "../lib/apiError";
+import { processStatusLabels } from "../lib/labels";
 import type { Process } from "../types/process";
 
 const statusColor: Record<Process["Status"], "default" | "info" | "success"> = {
@@ -43,7 +44,7 @@ export function ProcessList() {
       .get<Process[]>("/processes")
       .then((res) => setProcesses(res.data))
       .catch((err) =>
-        setError(getApiErrorMessage(err, "Could not load processes"))
+        setError(getApiErrorMessage(err, "No se pudieron cargar los procesos"))
       );
   }, []);
 
@@ -60,10 +61,10 @@ export function ProcessList() {
         }}
       >
         <Typography variant="h5" component="h1">
-          Processes
+          Procesos
         </Typography>
         <Button variant="contained" component={RouterLink} to="/processes/new">
-          Create Process
+          Crear Proceso
         </Button>
       </Box>
 
@@ -76,7 +77,7 @@ export function ProcessList() {
       )}
 
       {processes && processes.length === 0 && (
-        <Typography color="text.secondary">No processes yet.</Typography>
+        <Typography color="text.secondary">Todavía no hay procesos.</Typography>
       )}
 
       {processes && processes.length > 0 && isMobile && (
@@ -99,7 +100,7 @@ export function ProcessList() {
                       {process.Name}
                     </Typography>
                     <Chip
-                      label={process.Status}
+                      label={processStatusLabels[process.Status]}
                       color={statusColor[process.Status]}
                       size="small"
                     />
@@ -109,7 +110,7 @@ export function ProcessList() {
                     color="text.secondary"
                     sx={{ display: "block", mt: 0.5 }}
                   >
-                    {new Date(process.CreatedAt).toLocaleString()}
+                    {new Date(process.CreatedAt).toLocaleString("es-MX")}
                   </Typography>
                 </CardContent>
               </CardActionArea>
@@ -123,9 +124,9 @@ export function ProcessList() {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Name</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell>Created</TableCell>
+                <TableCell>Nombre</TableCell>
+                <TableCell>Estado</TableCell>
+                <TableCell>Creado</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -139,13 +140,13 @@ export function ProcessList() {
                   <TableCell>{process.Name}</TableCell>
                   <TableCell>
                     <Chip
-                      label={process.Status}
+                      label={processStatusLabels[process.Status]}
                       color={statusColor[process.Status]}
                       size="small"
                     />
                   </TableCell>
                   <TableCell>
-                    {new Date(process.CreatedAt).toLocaleString()}
+                    {new Date(process.CreatedAt).toLocaleString("es-MX")}
                   </TableCell>
                 </TableRow>
               ))}

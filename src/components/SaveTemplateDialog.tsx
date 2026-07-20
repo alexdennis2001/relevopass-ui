@@ -38,17 +38,17 @@ export function SaveTemplateDialog({
 
   return (
     <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
-      <DialogTitle>Save as template</DialogTitle>
+      <DialogTitle>Guardar como plantilla</DialogTitle>
       <DialogContent>
         <DialogContentText sx={{ mb: 2 }}>
-          This saves the steps, subprocesses, titles, descriptions, and
-          assignees so you can reuse them the next time you create a similar
-          process.
+          Esto guarda los pasos, subprocesos, títulos, descripciones y
+          asignados para que puedas reutilizarlos la próxima vez que crees un
+          proceso similar.
         </DialogContentText>
         <TextField
           autoFocus
           fullWidth
-          label="Template name"
+          label="Nombre de la plantilla"
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
@@ -56,7 +56,7 @@ export function SaveTemplateDialog({
       </DialogContent>
       <DialogActions>
         <Button type="button" onClick={handleClose} disabled={submitting}>
-          Cancel
+          Cancelar
         </Button>
         <Button
           type="button"
@@ -64,7 +64,7 @@ export function SaveTemplateDialog({
           disabled={submitting || !name.trim()}
           onClick={handleConfirm}
         >
-          {submitting ? "Saving..." : "Save Template"}
+          {submitting ? "Guardando..." : "Guardar Plantilla"}
         </Button>
       </DialogActions>
     </Dialog>

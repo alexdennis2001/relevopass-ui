@@ -54,7 +54,7 @@ export function EditProcess() {
         setSteps(res.data.steps.map(toStepForm));
       })
       .catch((err) =>
-        setLoadError(getApiErrorMessage(err, "Could not load process"))
+        setLoadError(getApiErrorMessage(err, "No se pudo cargar el proceso"))
       );
     apiClient.get<PublicUser[]>("/users").then((res) => setUsers(res.data));
   }, [id]);
@@ -81,7 +81,7 @@ export function EditProcess() {
       });
       navigate(`/processes/${id}`);
     } catch (err) {
-      setError(getApiErrorMessage(err, "Could not save changes"));
+      setError(getApiErrorMessage(err, "No se pudieron guardar los cambios"));
     } finally {
       setSubmitting(false);
     }
@@ -101,14 +101,14 @@ export function EditProcess() {
 
   if (status !== "DRAFT") {
     return (
-      <Alert severity="error">Only a draft process can be edited.</Alert>
+      <Alert severity="error">Solo se puede editar un proceso en borrador.</Alert>
     );
   }
 
   return (
     <Box component="form" onSubmit={handleSubmit}>
       <Typography variant="h5" component="h1" gutterBottom>
-        Edit Process Steps
+        Editar Pasos del Proceso
       </Typography>
 
       {error && (
@@ -126,7 +126,7 @@ export function EditProcess() {
           size="large"
           disabled={submitting}
         >
-          {submitting ? "Saving..." : "Save Changes"}
+          {submitting ? "Guardando..." : "Guardar Cambios"}
         </Button>
       </Box>
     </Box>

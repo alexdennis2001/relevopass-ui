@@ -24,6 +24,7 @@ import { useAuth } from "../context/AuthContext";
 import { ElapsedDaysChip } from "../components/ElapsedDaysChip";
 import { RejectDialog } from "../components/RejectDialog";
 import { SaveTemplateDialog } from "../components/SaveTemplateDialog";
+import { processStatusLabels, stepStatusLabels } from "../lib/labels";
 import type {
   ProcessDetail as ProcessDetailType,
   ProcessStatus,
@@ -69,7 +70,7 @@ export function ProcessDetail() {
       .get<ProcessDetailType>(`/processes/${id}`)
       .then((res) => setDetail(res.data))
       .catch((err) =>
-        setLoadError(getApiErrorMessage(err, "Could not load process"))
+        setLoadError(getApiErrorMessage(err, "No se pudo cargar el proceso"))
       );
   }, [id]);
 
@@ -87,7 +88,7 @@ export function ProcessDetail() {
       );
       setDetail(res.data);
     } catch (err) {
-      setActionError(getApiErrorMessage(err, "Could not start process"));
+      setActionError(getApiErrorMessage(err, "No se pudo iniciar el proceso"));
     } finally {
       setStarting(false);
     }
@@ -102,7 +103,7 @@ export function ProcessDetail() {
       );
       setDetail(res.data);
     } catch (err) {
-      setActionError(getApiErrorMessage(err, "Could not complete step"));
+      setActionError(getApiErrorMessage(err, "No se pudo completar el paso"));
     } finally {
       setActioningId(null);
     }
@@ -118,7 +119,7 @@ export function ProcessDetail() {
       );
       setDetail(res.data);
     } catch (err) {
-      setActionError(getApiErrorMessage(err, "Could not reject step"));
+      setActionError(getApiErrorMessage(err, "No se pudo rechazar el paso"));
     } finally {
       setActioningId(null);
     }
@@ -133,7 +134,7 @@ export function ProcessDetail() {
       );
       setDetail(res.data);
     } catch (err) {
-      setActionError(getApiErrorMessage(err, "Could not complete subprocess"));
+      setActionError(getApiErrorMessage(err, "No se pudo completar el subproceso"));
     } finally {
       setActioningId(null);
     }
@@ -149,7 +150,7 @@ export function ProcessDetail() {
       );
       setDetail(res.data);
     } catch (err) {
-      setActionError(getApiErrorMessage(err, "Could not reject subprocess"));
+      setActionError(getApiErrorMessage(err, "No se pudo rechazar el subproceso"));
     } finally {
       setActioningId(null);
     }
@@ -172,9 +173,9 @@ export function ProcessDetail() {
     try {
       await apiClient.post("/process-templates", { processId: id, name });
       setSaveTemplateOpen(false);
-      setTemplateMessage(`Saved as template "${name}".`);
+      setTemplateMessage(`Se guardó como plantilla "${name}".`);
     } catch (err) {
-      setActionError(getApiErrorMessage(err, "Could not save template"));
+      setActionError(getApiErrorMessage(err, "No se pudo guardar la plantilla"));
     } finally {
       setSavingTemplate(false);
     }
@@ -226,7 +227,7 @@ export function ProcessDetail() {
           sx={{ alignItems: "center", flexWrap: "wrap" }}
         >
           <Chip
-            label={process.Status}
+            label={processStatusLabels[process.Status]}
             color={processStatusColor[process.Status]}
           />
           {process.Status === "DRAFT" && user?.role === "ADMIN" && (
@@ -235,10 +236,10 @@ export function ProcessDetail() {
                 variant="outlined"
                 onClick={() => navigate(`/processes/${id}/edit`)}
               >
-                Edit Process
+                Editar Proceso
               </Button>
               <Button variant="contained" onClick={handleStart} disabled={starting}>
-                {starting ? "Starting..." : "Start Process"}
+                {starting ? "Iniciando..." : "Iniciar Proceso"}
               </Button>
             </>
           )}
@@ -247,7 +248,7 @@ export function ProcessDetail() {
               variant="outlined"
               onClick={() => setSaveTemplateOpen(true)}
             >
-              Save as Template
+              Guardar como Plantilla
             </Button>
           )}
         </Stack>
@@ -295,7 +296,7 @@ export function ProcessDetail() {
         to={`/processes/${id}/events`}
         sx={{ display: "inline-block", mb: 2 }}
       >
-        View event history
+        Ver historial de eventos
       </Link>
 
       <Stack spacing={2}>
@@ -320,10 +321,10 @@ export function ProcessDetail() {
                 }}
               >
                 <Typography variant="subtitle1">
-                  Step {step.Position}: {step.Title}
+                  Paso {step.Position}: {step.Title}
                   {process.CurrentStepId === step.Id && (
                     <Chip
-                      label="Current"
+                      label="Actual"
                       size="small"
                       color="primary"
                       sx={{ ml: 1 }}
@@ -341,7 +342,7 @@ export function ProcessDetail() {
                     completedAt={step.CompletedAt}
                   />
                   <Chip
-                    label={step.Status}
+                    label={stepStatusLabels[step.Status]}
                     size="small"
                     color={stepStatusColor[step.Status]}
                   />
@@ -357,13 +358,13 @@ export function ProcessDetail() {
                 </Typography>
               )}
               <Typography variant="body2" sx={{ mt: 1 }}>
-                Assignee: {step.AssigneeFirstName} {step.AssigneeLastName} (
+                Asignado: {step.AssigneeFirstName} {step.AssigneeLastName} (
                 {step.AssigneeEmail})
               </Typography>
 
               {step.RejectionNote && (
                 <Alert severity="warning" sx={{ mt: 1 }}>
-                  <strong>Rejected:</strong> {step.RejectionNote}
+                  <strong>Rechazado:</strong> {step.RejectionNote}
                 </Alert>
               )}
 
@@ -371,7 +372,7 @@ export function ProcessDetail() {
                 <>
                   <Divider sx={{ my: 1.5 }} />
                   <Typography variant="body2" sx={{ mb: 1 }}>
-                    Subprocesses
+                    Subprocesos
                   </Typography>
                   <Stack spacing={1}>
                     {step.substeps.map((substep) => (
@@ -423,7 +424,7 @@ export function ProcessDetail() {
                                     })
                                   }
                                 >
-                                  Reject
+                                  Rechazar
                                 </Button>
                               )}
                             <ElapsedDaysChip
@@ -431,7 +432,7 @@ export function ProcessDetail() {
                               completedAt={substep.CompletedAt}
                             />
                             <Chip
-                              label={substep.Status}
+                              label={stepStatusLabels[substep.Status]}
                               size="small"
                               color={stepStatusColor[substep.Status]}
                             />
@@ -439,7 +440,7 @@ export function ProcessDetail() {
                         </Box>
                         {substep.RejectionNote && (
                           <Alert severity="warning" sx={{ mt: 0.5 }}>
-                            <strong>Rejected:</strong> {substep.RejectionNote}
+                            <strong>Rechazado:</strong> {substep.RejectionNote}
                           </Alert>
                         )}
                       </Box>
@@ -482,7 +483,7 @@ export function ProcessDetail() {
                             setRejectTarget({ type: "step", id: step.Id })
                           }
                         >
-                          Reject
+                          Rechazar
                         </Button>
                       )}
                     </Stack>
@@ -494,7 +495,7 @@ export function ProcessDetail() {
                         color="text.secondary"
                         sx={{ display: "block", mt: 0.5 }}
                       >
-                        All subprocesses must be completed first.
+                        Primero deben completarse todos los subprocesos.
                       </Typography>
                     )}
                   </>
@@ -507,12 +508,14 @@ export function ProcessDetail() {
       <RejectDialog
         open={rejectTarget !== null}
         title={
-          rejectTarget?.type === "step" ? "Reject step" : "Reject subprocess"
+          rejectTarget?.type === "step"
+            ? "Rechazar paso"
+            : "Rechazar subproceso"
         }
         description={
           rejectTarget?.type === "step"
-            ? "This will send the process back to the previous step. Let the previous assignee know what needs to be fixed."
-            : "This will send the subprocess back to its assignee. Let them know what needs to be fixed."
+            ? "Esto enviará el proceso de vuelta al paso anterior."
+            : "Esto enviará el subproceso de vuelta a su asignado."
         }
         submitting={
           rejectTarget !== null && actioningId === rejectTarget.id

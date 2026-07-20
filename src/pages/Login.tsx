@@ -35,7 +35,7 @@ export function Login() {
       await login(email, password);
       navigate("/");
     } catch (err) {
-      setError(getApiErrorMessage(err, "Invalid email or password"));
+      setError(getApiErrorMessage(err, "Correo electrónico o contraseña incorrectos"));
     } finally {
       setSubmitting(false);
     }
@@ -46,7 +46,7 @@ export function Login() {
       <Box sx={{ minHeight: "100vh", display: "flex", alignItems: "center" }}>
         <Paper elevation={3} sx={{ p: 4, width: "100%" }}>
           <Typography variant="h5" component="h1" gutterBottom>
-            Log in to RelevoPass
+            Iniciar sesión en RelevoPass
           </Typography>
           <Box
             component="form"
@@ -55,7 +55,7 @@ export function Login() {
           >
             {error && <Alert severity="error">{error}</Alert>}
             <TextField
-              label="Email"
+              label="Correo electrónico"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -64,7 +64,7 @@ export function Login() {
               autoFocus
             />
             <TextField
-              label="Password"
+              label="Contraseña"
               type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -79,7 +79,9 @@ export function Login() {
                         onClick={() => setShowPassword((prev) => !prev)}
                         edge="end"
                         aria-label={
-                          showPassword ? "Hide password" : "Show password"
+                          showPassword
+                            ? "Ocultar contraseña"
+                            : "Mostrar contraseña"
                         }
                       >
                         {showPassword ? <VisibilityOff /> : <Visibility />}
@@ -95,12 +97,12 @@ export function Login() {
               size="large"
               disabled={submitting}
             >
-              {submitting ? "Logging in..." : "Log in"}
+              {submitting ? "Iniciando sesión..." : "Iniciar sesión"}
             </Button>
             <Typography variant="body2" align="center">
-              Don't have an account?{" "}
+              ¿No tienes una cuenta?{" "}
               <Link component={RouterLink} to="/register">
-                Register
+                Regístrate
               </Link>
             </Typography>
           </Box>

@@ -34,7 +34,7 @@ export function ElapsedDaysChip({
 
   return (
     <Chip
-      label={`${days} day${days === 1 ? "" : "s"}`}
+      label={`${days} día${days === 1 ? "" : "s"}`}
       size="small"
       color={colorForDays(days)}
     />

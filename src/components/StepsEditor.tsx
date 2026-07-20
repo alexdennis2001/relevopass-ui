@@ -147,7 +147,7 @@ export function StepsEditor({
               }}
             >
               <Typography variant="subtitle1">
-                Step {startNumberAt + stepIndex}
+                Paso {startNumberAt + stepIndex}
               </Typography>
               <Stack direction="row" spacing={0.5}>
                 <IconButton
@@ -155,7 +155,7 @@ export function StepsEditor({
                   size="small"
                   onClick={() => moveStepUp(stepIndex)}
                   disabled={stepIndex === 0}
-                  aria-label="Move step up"
+                  aria-label="Subir paso"
                 >
                   <ArrowUpwardIcon fontSize="small" />
                 </IconButton>
@@ -164,7 +164,7 @@ export function StepsEditor({
                   size="small"
                   onClick={() => moveStepDown(stepIndex)}
                   disabled={stepIndex === steps.length - 1}
-                  aria-label="Move step down"
+                  aria-label="Bajar paso"
                 >
                   <ArrowDownwardIcon fontSize="small" />
                 </IconButton>
@@ -173,7 +173,7 @@ export function StepsEditor({
                     type="button"
                     size="small"
                     onClick={() => removeStep(stepIndex)}
-                    aria-label="Remove step"
+                    aria-label="Eliminar paso"
                   >
                     <DeleteIcon fontSize="small" />
                   </IconButton>
@@ -183,7 +183,7 @@ export function StepsEditor({
 
             <Stack spacing={2}>
               <TextField
-                label="Title"
+                label="Título"
                 value={step.title}
                 onChange={(e) =>
                   updateStep(stepIndex, { title: e.target.value })
@@ -192,7 +192,7 @@ export function StepsEditor({
                 fullWidth
               />
               <TextField
-                label="Description"
+                label="Descripción"
                 value={step.description}
                 onChange={(e) =>
                   updateStep(stepIndex, { description: e.target.value })
@@ -201,7 +201,7 @@ export function StepsEditor({
               />
               <TextField
                 select
-                label="Assignee"
+                label="Asignado"
                 value={step.assigneeUserId}
                 onChange={(e) =>
                   updateStep(stepIndex, { assigneeUserId: e.target.value })
@@ -220,7 +220,7 @@ export function StepsEditor({
             <Divider sx={{ my: 2 }} />
 
             <Typography variant="body2" sx={{ mb: 1 }}>
-              Subprocesses
+              Subprocesos
             </Typography>
 
             <Stack spacing={2}>
@@ -235,7 +235,7 @@ export function StepsEditor({
                   }}
                 >
                   <TextField
-                    label="Title"
+                    label="Título"
                     size="small"
                     value={substep.title}
                     onChange={(e) =>
@@ -249,7 +249,7 @@ export function StepsEditor({
                   <Box sx={{ display: "flex", gap: 1, alignItems: "flex-start" }}>
                     <TextField
                       select
-                      label="Assignee"
+                      label="Asignado"
                       size="small"
                       value={substep.assigneeUserId}
                       onChange={(e) =>
@@ -270,7 +270,7 @@ export function StepsEditor({
                       type="button"
                       size="small"
                       onClick={() => removeSubstep(stepIndex, substepIndex)}
-                      aria-label="Remove subprocess"
+                      aria-label="Eliminar subproceso"
                     >
                       <DeleteIcon fontSize="small" />
                     </IconButton>
@@ -286,14 +286,14 @@ export function StepsEditor({
               onClick={() => addSubstep(stepIndex)}
               sx={{ mt: 1 }}
             >
-              Add subprocess
+              Agregar subproceso
             </Button>
           </CardContent>
         </Card>
       ))}
 
       <Button type="button" startIcon={<AddIcon />} onClick={addStep}>
-        Add step
+        Agregar paso
       </Button>
     </Stack>
   );

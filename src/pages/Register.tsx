@@ -37,7 +37,7 @@ export function Register() {
       await register({ firstName, lastName, email, password });
       navigate("/");
     } catch (err) {
-      setError(getApiErrorMessage(err, "Could not create account"));
+      setError(getApiErrorMessage(err, "No se pudo crear la cuenta"));
     } finally {
       setSubmitting(false);
     }
@@ -48,7 +48,7 @@ export function Register() {
       <Box sx={{ minHeight: "100vh", display: "flex", alignItems: "center" }}>
         <Paper elevation={3} sx={{ p: 4, width: "100%" }}>
           <Typography variant="h5" component="h1" gutterBottom>
-            Create your RelevoPass account
+            Crea tu cuenta de RelevoPass
           </Typography>
           <Box
             component="form"
@@ -57,7 +57,7 @@ export function Register() {
           >
             {error && <Alert severity="error">{error}</Alert>}
             <TextField
-              label="First name"
+              label="Nombre"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
               required
@@ -65,14 +65,14 @@ export function Register() {
               autoFocus
             />
             <TextField
-              label="Last name"
+              label="Apellido"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
               required
               fullWidth
             />
             <TextField
-              label="Email"
+              label="Correo electrónico"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -80,13 +80,13 @@ export function Register() {
               fullWidth
             />
             <TextField
-              label="Password"
+              label="Contraseña"
               type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
               fullWidth
-              helperText="At least 8 characters"
+              helperText="Mínimo 8 caracteres"
               slotProps={{
                 input: {
                   endAdornment: (
@@ -96,7 +96,9 @@ export function Register() {
                         onClick={() => setShowPassword((prev) => !prev)}
                         edge="end"
                         aria-label={
-                          showPassword ? "Hide password" : "Show password"
+                          showPassword
+                            ? "Ocultar contraseña"
+                            : "Mostrar contraseña"
                         }
                       >
                         {showPassword ? <VisibilityOff /> : <Visibility />}
@@ -112,12 +114,12 @@ export function Register() {
               size="large"
               disabled={submitting}
             >
-              {submitting ? "Creating account..." : "Register"}
+              {submitting ? "Creando cuenta..." : "Registrarse"}
             </Button>
             <Typography variant="body2" align="center">
-              Already have an account?{" "}
+              ¿Ya tienes una cuenta?{" "}
               <Link component={RouterLink} to="/login">
-                Log in
+                Iniciar sesión
               </Link>
             </Typography>
           </Box>

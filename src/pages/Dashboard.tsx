@@ -19,6 +19,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { apiClient } from "../lib/apiClient";
 import { getApiErrorMessage } from "../lib/apiError";
 import { useAuth } from "../context/AuthContext";
+import { processStatusLabels, userRoleLabels } from "../lib/labels";
 import type { Process, ProcessStatus } from "../types/process";
 
 const statusColor: Record<ProcessStatus, "default" | "info" | "success"> = {
@@ -38,7 +39,7 @@ export function Dashboard() {
       .get<Process[]>("/processes/mine")
       .then((res) => setProcesses(res.data))
       .catch((err) =>
-        setError(getApiErrorMessage(err, "Could not load your processes"))
+        setError(getApiErrorMessage(err, "No se pudieron cargar tus procesos"))
       );
   }, []);
 
@@ -88,7 +89,7 @@ export function Dashboard() {
                 )}
               </Box>
               <Chip
-                label={process.Status}
+                label={processStatusLabels[process.Status]}
                 color={statusColor[process.Status]}
                 size="small"
               />
@@ -117,7 +118,7 @@ export function Dashboard() {
               </Typography>
             </Box>
             <Chip
-              label={user.role}
+              label={userRoleLabels[user.role]}
               color={user.role === "ADMIN" ? "secondary" : "default"}
               sx={{ ml: "auto", flexShrink: 0 }}
             />
@@ -136,12 +137,12 @@ export function Dashboard() {
       {processes && (
         <>
           <Typography variant="h6" sx={{ mb: 2 }}>
-            My Processes
+            Mis Procesos
           </Typography>
 
           {activeProcesses && activeProcesses.length === 0 && (
             <Typography color="text.secondary" sx={{ mb: 3 }}>
-              You're not involved in any active processes yet.
+              No estás involucrado en ningún proceso activo todavía.
             </Typography>
           )}
 
@@ -161,13 +162,13 @@ export function Dashboard() {
           <Accordion>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Typography variant="h6">
-                Completed Processes ({completedProcesses?.length ?? 0})
+                Procesos Completados ({completedProcesses?.length ?? 0})
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
               {completedProcesses && completedProcesses.length === 0 && (
                 <Typography color="text.secondary">
-                  No completed processes yet.
+                  Todavía no hay procesos completados.
                 </Typography>
               )}
               {completedProcesses && completedProcesses.length > 0 && (

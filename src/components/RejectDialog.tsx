@@ -50,7 +50,7 @@ export function RejectDialog({
           fullWidth
           multiline
           minRows={3}
-          label="What needs to be fixed?"
+          label="¿Qué se necesita corregir?"
           value={note}
           onChange={(e) => setNote(e.target.value)}
           required
@@ -58,7 +58,7 @@ export function RejectDialog({
       </DialogContent>
       <DialogActions>
         <Button type="button" onClick={handleClose} disabled={submitting}>
-          Cancel
+          Cancelar
         </Button>
         <Button
           type="button"
@@ -67,7 +67,7 @@ export function RejectDialog({
           disabled={submitting || !note.trim()}
           onClick={handleConfirm}
         >
-          Reject
+          Rechazar
         </Button>
       </DialogActions>
     </Dialog>

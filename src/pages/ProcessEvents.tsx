@@ -24,14 +24,14 @@ import { getApiErrorMessage } from "../lib/apiError";
 import type { ProcessEvent } from "../types/process";
 
 const eventTypeLabels: Record<string, string> = {
-  PROCESS_CREATED: "Process created",
-  PROCESS_STARTED: "Process started",
-  STEP_ACTIVATED: "Step activated",
-  STEP_COMPLETED: "Step completed",
-  STEP_REJECTED: "Step rejected",
-  SUBSTEP_COMPLETED: "Subprocess completed",
-  SUBSTEP_REJECTED: "Subprocess rejected",
-  PROCESS_COMPLETED: "Process completed",
+  PROCESS_CREATED: "Proceso creado",
+  PROCESS_STARTED: "Proceso iniciado",
+  STEP_ACTIVATED: "Paso activado",
+  STEP_COMPLETED: "Paso completado",
+  STEP_REJECTED: "Paso rechazado",
+  SUBSTEP_COMPLETED: "Subproceso completado",
+  SUBSTEP_REJECTED: "Subproceso rechazado",
+  PROCESS_COMPLETED: "Proceso completado",
 };
 
 function getRejectionNote(metadata: string | null): string | null {
@@ -57,7 +57,7 @@ export function ProcessEvents() {
       .get<ProcessEvent[]>(`/processes/${id}/events`)
       .then((res) => setEvents(res.data))
       .catch((err) =>
-        setError(getApiErrorMessage(err, "Could not load event history"))
+        setError(getApiErrorMessage(err, "No se pudo cargar el historial de eventos"))
       );
   }, [id]);
 
@@ -76,7 +76,7 @@ export function ProcessEvents() {
   return (
     <Box>
       <Typography variant="h5" component="h1" gutterBottom>
-        Event History
+        Historial de Eventos
       </Typography>
 
       {isMobile && (
@@ -102,7 +102,7 @@ export function ProcessEvents() {
                       color="text.secondary"
                       sx={{ whiteSpace: "nowrap" }}
                     >
-                      {new Date(event.CreatedAt).toLocaleString()}
+                      {new Date(event.CreatedAt).toLocaleString("es-MX")}
                     </Typography>
                   </Box>
                   {note && (
@@ -133,9 +133,9 @@ export function ProcessEvents() {
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell>When</TableCell>
-                <TableCell>Event</TableCell>
-                <TableCell>By</TableCell>
+                <TableCell>Cuándo</TableCell>
+                <TableCell>Evento</TableCell>
+                <TableCell>Por</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -144,7 +144,7 @@ export function ProcessEvents() {
                 return (
                   <TableRow key={event.Id}>
                     <TableCell>
-                      {new Date(event.CreatedAt).toLocaleString()}
+                      {new Date(event.CreatedAt).toLocaleString("es-MX")}
                     </TableCell>
                     <TableCell>
                       {eventTypeLabels[event.EventType] ?? event.EventType}

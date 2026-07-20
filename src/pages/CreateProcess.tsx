@@ -70,7 +70,7 @@ export function CreateProcess() {
         }))
       );
     } catch (err) {
-      setError(getApiErrorMessage(err, "Could not load template"));
+      setError(getApiErrorMessage(err, "No se pudo cargar la plantilla"));
     } finally {
       setLoadingTemplate(false);
     }
@@ -97,7 +97,7 @@ export function CreateProcess() {
       });
       navigate(`/processes/${res.data.process.Id}`);
     } catch (err) {
-      setError(getApiErrorMessage(err, "Could not create process"));
+      setError(getApiErrorMessage(err, "No se pudo crear el proceso"));
     } finally {
       setSubmitting(false);
     }
@@ -106,7 +106,7 @@ export function CreateProcess() {
   return (
     <Box component="form" onSubmit={handleSubmit}>
       <Typography variant="h5" component="h1" gutterBottom>
-        Create Process
+        Crear Proceso
       </Typography>
 
       {error && (
@@ -118,15 +118,15 @@ export function CreateProcess() {
       {templates.length > 0 && (
         <TextField
           select
-          label="Start from a template"
+          label="Comenzar desde una plantilla"
           value={selectedTemplateId}
           onChange={(e) => handleTemplateChange(e.target.value)}
           fullWidth
           disabled={loadingTemplate}
-          helperText="Prefills steps, subprocesses, and assignees below. The name and description still need to be filled in."
+          helperText="Rellena los pasos, subprocesos y asignados a continuación. El nombre y la descripción todavía deben completarse."
           sx={{ mb: 3 }}
         >
-          <MenuItem value="">None</MenuItem>
+          <MenuItem value="">Ninguna</MenuItem>
           {templates.map((template) => (
             <MenuItem key={template.Id} value={template.Id}>
               {template.Name}
@@ -137,14 +137,14 @@ export function CreateProcess() {
 
       <Stack spacing={2} sx={{ mb: 3 }}>
         <TextField
-          label="Process name"
+          label="Nombre del proceso"
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
           fullWidth
         />
         <TextField
-          label="Description"
+          label="Descripción"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           fullWidth
@@ -162,7 +162,7 @@ export function CreateProcess() {
           size="large"
           disabled={submitting}
         >
-          {submitting ? "Creating..." : "Create Process"}
+          {submitting ? "Creando..." : "Crear Proceso"}
         </Button>
       </Box>
     </Box>

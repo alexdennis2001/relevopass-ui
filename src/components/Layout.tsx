@@ -32,12 +32,12 @@ export function Layout() {
   const navItems = [
     { label: "Dashboard", to: "/", icon: <DashboardIcon />, show: true },
     {
-      label: "Processes",
+      label: "Procesos",
       to: "/processes",
       icon: <ListAltIcon />,
       show: user?.role === "ADMIN",
     },
-    { label: "My Tasks", to: "/my-tasks", icon: <AssignmentIcon />, show: true },
+    { label: "Mis Tareas", to: "/my-tasks", icon: <AssignmentIcon />, show: true },
   ].filter((item) => item.show);
 
   const drawerContent = (
@@ -73,7 +73,7 @@ export function Layout() {
           <ListItemIcon>
             <LogoutIcon />
           </ListItemIcon>
-          <ListItemText primary="Log out" />
+          <ListItemText primary="Cerrar sesión" />
         </ListItemButton>
       </List>
     </Box>
@@ -88,7 +88,7 @@ export function Layout() {
             edge="start"
             onClick={() => setDrawerOpen(true)}
             sx={{ display: { xs: "inline-flex", md: "none" } }}
-            aria-label="Open navigation menu"
+            aria-label="Abrir menú de navegación"
           >
             <MenuIcon />
           </IconButton>
@@ -107,7 +107,7 @@ export function Layout() {
               </Button>
             ))}
             <Button color="inherit" onClick={() => logout()}>
-              Log out
+              Cerrar sesión
             </Button>
           </Box>
         </Toolbar>
