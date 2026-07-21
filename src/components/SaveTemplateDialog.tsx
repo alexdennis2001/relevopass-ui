@@ -41,7 +41,7 @@ export function SaveTemplateDialog({
       <DialogTitle>Guardar como plantilla</DialogTitle>
       <DialogContent>
         <DialogContentText sx={{ mb: 2 }}>
-          Esto guarda los pasos, subprocesos, títulos, descripciones y
+          Esto guarda los pasos, subpasos, títulos, descripciones y
           asignados para que puedas reutilizarlos la próxima vez que crees un
           proceso similar.
         </DialogContentText>

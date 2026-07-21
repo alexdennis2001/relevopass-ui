@@ -123,7 +123,7 @@ export function CreateProcess() {
           onChange={(e) => handleTemplateChange(e.target.value)}
           fullWidth
           disabled={loadingTemplate}
-          helperText="Rellena los pasos, subprocesos y asignados a continuación. El nombre y la descripción todavía deben completarse."
+          helperText="Rellena los pasos, subpasos y asignados a continuación. El nombre y la descripción todavía deben completarse."
           sx={{ mb: 3 }}
         >
           <MenuItem value="">Ninguna</MenuItem>

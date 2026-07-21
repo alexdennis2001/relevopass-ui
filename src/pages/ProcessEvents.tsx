@@ -29,8 +29,8 @@ const eventTypeLabels: Record<string, string> = {
   STEP_ACTIVATED: "Paso activado",
   STEP_COMPLETED: "Paso completado",
   STEP_REJECTED: "Paso rechazado",
-  SUBSTEP_COMPLETED: "Subproceso completado",
-  SUBSTEP_REJECTED: "Subproceso rechazado",
+  SUBSTEP_COMPLETED: "Subpaso completado",
+  SUBSTEP_REJECTED: "Subpaso rechazado",
   PROCESS_COMPLETED: "Proceso completado",
 };
 

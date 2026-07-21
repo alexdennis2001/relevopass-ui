@@ -108,7 +108,7 @@ export function MyTasks() {
       await apiClient.post(`/process-substeps/${substepId}/complete`);
       load();
     } catch (err) {
-      setActionError(getApiErrorMessage(err, "No se pudo completar el subproceso"));
+      setActionError(getApiErrorMessage(err, "No se pudo completar el subpaso"));
     } finally {
       setBusyId(null);
     }
@@ -217,7 +217,7 @@ export function MyTasks() {
                       sx={{ display: "block" }}
                     >
                       Esperando {step.incompleteSubsteps.length} de{" "}
-                      {step.TotalSubsteps} subprocesos por completar antes de
+                      {step.TotalSubsteps} subpasos por completar antes de
                       poder aprobar esto:
                     </Typography>
                     <Stack sx={{ pl: 1 }}>
@@ -241,11 +241,11 @@ export function MyTasks() {
       </Stack>
 
       <Typography variant="subtitle1" sx={{ mt: 2, mb: 1 }}>
-        Subprocesos
+        Subpasos
       </Typography>
       {substeps.length === 0 && (
         <Typography color="text.secondary">
-          No hay subprocesos esperándote en este momento.
+          No hay subpasos esperándote en este momento.
         </Typography>
       )}
       <Stack spacing={2}>

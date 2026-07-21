@@ -220,7 +220,7 @@ export function StepsEditor({
             <Divider sx={{ my: 2 }} />
 
             <Typography variant="body2" sx={{ mb: 1 }}>
-              Subprocesos
+              Subpasos
             </Typography>
 
             <Stack spacing={2}>
@@ -277,7 +277,7 @@ export function StepsEditor({
                       type="button"
                       size="small"
                       onClick={() => removeSubstep(stepIndex, substepIndex)}
-                      aria-label="Eliminar subproceso"
+                      aria-label="Eliminar subpaso"
                     >
                       <DeleteIcon fontSize="small" />
                     </IconButton>
@@ -293,7 +293,7 @@ export function StepsEditor({
               onClick={() => addSubstep(stepIndex)}
               sx={{ mt: 1 }}
             >
-              Agregar subproceso
+              Agregar subpaso
             </Button>
           </CardContent>
         </Card>

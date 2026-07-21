@@ -134,7 +134,7 @@ export function ProcessDetail() {
       );
       setDetail(res.data);
     } catch (err) {
-      setActionError(getApiErrorMessage(err, "No se pudo completar el subproceso"));
+      setActionError(getApiErrorMessage(err, "No se pudo completar el subpaso"));
     } finally {
       setActioningId(null);
     }
@@ -150,7 +150,7 @@ export function ProcessDetail() {
       );
       setDetail(res.data);
     } catch (err) {
-      setActionError(getApiErrorMessage(err, "No se pudo rechazar el subproceso"));
+      setActionError(getApiErrorMessage(err, "No se pudo rechazar el subpaso"));
     } finally {
       setActioningId(null);
     }
@@ -372,7 +372,7 @@ export function ProcessDetail() {
                 <>
                   <Divider sx={{ my: 1.5 }} />
                   <Typography variant="body2" sx={{ mb: 1 }}>
-                    Subprocesos
+                    Subpasos
                   </Typography>
                   <Stack spacing={1}>
                     {step.substeps.map((substep) => (
@@ -495,7 +495,7 @@ export function ProcessDetail() {
                         color="text.secondary"
                         sx={{ display: "block", mt: 0.5 }}
                       >
-                        Primero deben completarse todos los subprocesos.
+                        Primero deben completarse todos los subpasos.
                       </Typography>
                     )}
                   </>
@@ -510,12 +510,12 @@ export function ProcessDetail() {
         title={
           rejectTarget?.type === "step"
             ? "Rechazar paso"
-            : "Rechazar subproceso"
+            : "Rechazar subpaso"
         }
         description={
           rejectTarget?.type === "step"
             ? "Esto enviará el proceso de vuelta al paso anterior."
-            : "Esto enviará el subproceso de vuelta a su asignado."
+            : "Esto enviará el subpaso de vuelta a su asignado."
         }
         submitting={
           rejectTarget !== null && actioningId === rejectTarget.id
