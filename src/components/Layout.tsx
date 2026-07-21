@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {
   AppBar,
+  Badge,
   Box,
   Button,
   Container,
@@ -20,6 +21,7 @@ import AssignmentIcon from "@mui/icons-material/Assignment";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { Link as RouterLink, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useTaskCount } from "../context/TaskCountContext";
 import logoBlanco from "../assets/logo-blanco.png";
 import logoVerde from "../assets/logo-verde.png";
 
@@ -27,18 +29,26 @@ const DRAWER_WIDTH = 260;
 
 export function Layout() {
   const { logout, user } = useAuth();
+  const { pendingCount } = useTaskCount();
   const location = useLocation();
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const navItems = [
-    { label: "Dashboard", to: "/", icon: <DashboardIcon />, show: true },
+    { label: "Dashboard", to: "/", icon: <DashboardIcon />, show: true, badge: 0 },
     {
       label: "Procesos",
       to: "/processes",
       icon: <ListAltIcon />,
       show: user?.role === "ADMIN",
+      badge: 0,
     },
-    { label: "Mis Tareas", to: "/my-tasks", icon: <AssignmentIcon />, show: true },
+    {
+      label: "Mis Tareas",
+      to: "/my-tasks",
+      icon: <AssignmentIcon />,
+      show: true,
+      badge: pendingCount,
+    },
   ].filter((item) => item.show);
 
   const drawerContent = (
@@ -61,7 +71,15 @@ export function Layout() {
             selected={location.pathname === item.to}
             onClick={() => setDrawerOpen(false)}
           >
-            <ListItemIcon>{item.icon}</ListItemIcon>
+            <ListItemIcon>
+              <Badge
+                badgeContent={item.badge}
+                color="error"
+                invisible={item.badge === 0}
+              >
+                {item.icon}
+              </Badge>
+            </ListItemIcon>
             <ListItemText primary={item.label} />
           </ListItemButton>
         ))}
@@ -112,7 +130,14 @@ export function Layout() {
                 component={RouterLink}
                 to={item.to}
               >
-                {item.label}
+                <Badge
+                  badgeContent={item.badge}
+                  color="error"
+                  invisible={item.badge === 0}
+                  sx={{ "& .MuiBadge-badge": { right: -8, top: -2 } }}
+                >
+                  {item.label}
+                </Badge>
               </Button>
             ))}
             <Button color="inherit" onClick={() => logout()}>

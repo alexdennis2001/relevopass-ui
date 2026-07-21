@@ -21,6 +21,7 @@ import {
 import { apiClient } from "../lib/apiClient";
 import { getApiErrorMessage } from "../lib/apiError";
 import { useAuth } from "../context/AuthContext";
+import { useTaskCount } from "../context/TaskCountContext";
 import { ElapsedDaysChip } from "../components/ElapsedDaysChip";
 import { RejectDialog } from "../components/RejectDialog";
 import { SaveTemplateDialog } from "../components/SaveTemplateDialog";
@@ -53,6 +54,7 @@ export function ProcessDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { refreshPendingCount } = useTaskCount();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [detail, setDetail] = useState<ProcessDetailType | null>(null);
@@ -105,6 +107,7 @@ export function ProcessDetail() {
         `/process-steps/${stepId}/complete`
       );
       setDetail(res.data);
+      refreshPendingCount();
     } catch (err) {
       setActionError(getApiErrorMessage(err, "No se pudo completar el paso"));
     } finally {
@@ -121,6 +124,7 @@ export function ProcessDetail() {
         { note }
       );
       setDetail(res.data);
+      refreshPendingCount();
     } catch (err) {
       setActionError(getApiErrorMessage(err, "No se pudo rechazar el paso"));
     } finally {
@@ -136,6 +140,7 @@ export function ProcessDetail() {
         `/process-substeps/${substepId}/complete`
       );
       setDetail(res.data);
+      refreshPendingCount();
     } catch (err) {
       setActionError(getApiErrorMessage(err, "No se pudo completar el subpaso"));
     } finally {
@@ -152,6 +157,7 @@ export function ProcessDetail() {
         { note }
       );
       setDetail(res.data);
+      refreshPendingCount();
     } catch (err) {
       setActionError(getApiErrorMessage(err, "No se pudo rechazar el subpaso"));
     } finally {

@@ -13,6 +13,7 @@ import { apiClient } from "../lib/apiClient";
 import { getApiErrorMessage } from "../lib/apiError";
 import { ElapsedDaysChip } from "../components/ElapsedDaysChip";
 import { RejectDialog } from "../components/RejectDialog";
+import { useTaskCount } from "../context/TaskCountContext";
 
 type IncompleteSubstepInfo = {
   Title: string;
@@ -52,6 +53,7 @@ type MySubstepTask = {
 };
 
 export function MyTasks() {
+  const { refreshPendingCount } = useTaskCount();
   const [steps, setSteps] = useState<MyStepTask[] | null>(null);
   const [substeps, setSubsteps] = useState<MySubstepTask[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -81,6 +83,7 @@ export function MyTasks() {
     try {
       await apiClient.post(`/process-steps/${stepId}/complete`);
       load();
+      refreshPendingCount();
     } catch (err) {
       setActionError(getApiErrorMessage(err, "No se pudo completar el paso"));
     } finally {
@@ -94,6 +97,7 @@ export function MyTasks() {
     try {
       await apiClient.post(`/process-steps/${stepId}/reject`, { note });
       load();
+      refreshPendingCount();
     } catch (err) {
       setActionError(getApiErrorMessage(err, "No se pudo rechazar el paso"));
     } finally {
@@ -107,6 +111,7 @@ export function MyTasks() {
     try {
       await apiClient.post(`/process-substeps/${substepId}/complete`);
       load();
+      refreshPendingCount();
     } catch (err) {
       setActionError(getApiErrorMessage(err, "No se pudo completar el subpaso"));
     } finally {
