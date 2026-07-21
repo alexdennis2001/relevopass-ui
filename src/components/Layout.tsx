@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   AppBar,
   Badge,
@@ -12,18 +12,28 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Snackbar,
   Toolbar,
+  Tooltip,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import LogoutIcon from "@mui/icons-material/Logout";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import NotificationsOffIcon from "@mui/icons-material/NotificationsOff";
 import { Link as RouterLink, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useTaskCount } from "../context/TaskCountContext";
 import logoBlanco from "../assets/logo-blanco.png";
 import logoVerde from "../assets/logo-verde.png";
+import {
+  getExistingPushSubscription,
+  isPushSupported,
+  subscribeToPush,
+  unsubscribeFromPush,
+} from "../lib/pushNotifications";
 
 const DRAWER_WIDTH = 260;
 
@@ -32,6 +42,31 @@ export function Layout() {
   const { pendingCount } = useTaskCount();
   const location = useLocation();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [pushSubscribed, setPushSubscribed] = useState(false);
+  const [pushError, setPushError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isPushSupported()) return;
+    getExistingPushSubscription().then((sub) => setPushSubscribed(sub !== null));
+  }, []);
+
+  async function handleTogglePush() {
+    try {
+      if (pushSubscribed) {
+        await unsubscribeFromPush();
+        setPushSubscribed(false);
+      } else {
+        await subscribeToPush();
+        setPushSubscribed(true);
+      }
+    } catch (err) {
+      setPushError(
+        err instanceof Error
+          ? err.message
+          : "No se pudo actualizar tu preferencia de notificaciones"
+      );
+    }
+  }
 
   const navItems = [
     { label: "Dashboard", to: "/", icon: <DashboardIcon />, show: true, badge: 0 },
@@ -86,6 +121,20 @@ export function Layout() {
       </List>
       <Divider />
       <List>
+        {isPushSupported() && (
+          <ListItemButton onClick={handleTogglePush}>
+            <ListItemIcon>
+              {pushSubscribed ? <NotificationsIcon /> : <NotificationsOffIcon />}
+            </ListItemIcon>
+            <ListItemText
+              primary={
+                pushSubscribed
+                  ? "Desactivar notificaciones"
+                  : "Activar notificaciones"
+              }
+            />
+          </ListItemButton>
+        )}
         <ListItemButton
           onClick={() => {
             setDrawerOpen(false);
@@ -114,7 +163,16 @@ export function Layout() {
           >
             <MenuIcon />
           </IconButton>
-          <Box sx={{ flexGrow: 1, display: "flex", alignItems: "center" }}>
+          <Box
+            component={RouterLink}
+            to="/"
+            sx={{
+              flexGrow: 1,
+              display: "flex",
+              alignItems: "center",
+              textDecoration: "none",
+            }}
+          >
             <Box
               component="img"
               src={logoBlanco}
@@ -140,12 +198,35 @@ export function Layout() {
                 </Badge>
               </Button>
             ))}
+            {isPushSupported() && (
+              <Tooltip
+                title={
+                  pushSubscribed
+                    ? "Desactivar notificaciones"
+                    : "Activar notificaciones"
+                }
+              >
+                <IconButton color="inherit" onClick={handleTogglePush}>
+                  {pushSubscribed ? (
+                    <NotificationsIcon />
+                  ) : (
+                    <NotificationsOffIcon />
+                  )}
+                </IconButton>
+              </Tooltip>
+            )}
             <Button color="inherit" onClick={() => logout()}>
               Cerrar sesión
             </Button>
           </Box>
         </Toolbar>
       </AppBar>
+      <Snackbar
+        open={pushError !== null}
+        autoHideDuration={5000}
+        onClose={() => setPushError(null)}
+        message={pushError}
+      />
       <Drawer
         anchor="left"
         open={drawerOpen}
