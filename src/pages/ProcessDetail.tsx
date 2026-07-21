@@ -24,6 +24,7 @@ import { useAuth } from "../context/AuthContext";
 import { ElapsedDaysChip } from "../components/ElapsedDaysChip";
 import { RejectDialog } from "../components/RejectDialog";
 import { SaveTemplateDialog } from "../components/SaveTemplateDialog";
+import { DeleteProcessDialog } from "../components/DeleteProcessDialog";
 import { processStatusLabels, stepStatusLabels } from "../lib/labels";
 import type {
   ProcessDetail as ProcessDetailType,
@@ -63,6 +64,8 @@ export function ProcessDetail() {
   const [saveTemplateOpen, setSaveTemplateOpen] = useState(false);
   const [savingTemplate, setSavingTemplate] = useState(false);
   const [templateMessage, setTemplateMessage] = useState<string | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const load = useCallback(() => {
     if (!id) return;
@@ -181,6 +184,20 @@ export function ProcessDetail() {
     }
   }
 
+  async function handleDeleteProcess() {
+    if (!id) return;
+    setDeleting(true);
+    setActionError(null);
+    try {
+      await apiClient.delete(`/processes/${id}`);
+      navigate("/");
+    } catch (err) {
+      setActionError(getApiErrorMessage(err, "No se pudo eliminar el proceso"));
+      setDeleting(false);
+      setDeleteDialogOpen(false);
+    }
+  }
+
   if (loadError) {
     return <Alert severity="error">{loadError}</Alert>;
   }
@@ -197,6 +214,10 @@ export function ProcessDetail() {
   const activeStepIndex = steps.findIndex(
     (step) => step.Id === process.CurrentStepId
   );
+  const canDelete =
+    process.Status !== "COMPLETED" &&
+    (process.CreatedByUserId === user?.id ||
+      steps.some((step) => step.AssigneeUserId === user?.id));
 
   return (
     <Box>
@@ -249,6 +270,15 @@ export function ProcessDetail() {
               onClick={() => setSaveTemplateOpen(true)}
             >
               Guardar como Plantilla
+            </Button>
+          )}
+          {canDelete && (
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={() => setDeleteDialogOpen(true)}
+            >
+              Eliminar Proceso
             </Button>
           )}
         </Stack>
@@ -529,6 +559,14 @@ export function ProcessDetail() {
         submitting={savingTemplate}
         onCancel={() => setSaveTemplateOpen(false)}
         onConfirm={handleSaveTemplate}
+      />
+
+      <DeleteProcessDialog
+        open={deleteDialogOpen}
+        processName={process.Name}
+        submitting={deleting}
+        onCancel={() => setDeleteDialogOpen(false)}
+        onConfirm={handleDeleteProcess}
       />
     </Box>
   );
