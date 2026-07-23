@@ -29,8 +29,8 @@ import { useTaskCount } from "../context/TaskCountContext";
 import logoBlanco from "../assets/logo-blanco.png";
 import logoVerde from "../assets/logo-verde.png";
 import {
-  getExistingPushSubscription,
   isPushSupported,
+  isSubscribedForCurrentUser,
   subscribeToPush,
   unsubscribeFromPush,
 } from "../lib/pushNotifications";
@@ -46,9 +46,14 @@ export function Layout() {
   const [pushError, setPushError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!isPushSupported()) return;
-    getExistingPushSubscription().then((sub) => setPushSubscribed(sub !== null));
-  }, []);
+    if (!isPushSupported() || !user) {
+      setPushSubscribed(false);
+      return;
+    }
+    // A browser-level subscription can belong to a *different* account on a
+    // shared device — confirm it's actually this user's before showing "on".
+    isSubscribedForCurrentUser().then(setPushSubscribed);
+  }, [user]);
 
   async function handleTogglePush() {
     try {

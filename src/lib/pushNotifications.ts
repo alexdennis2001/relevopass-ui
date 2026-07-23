@@ -49,6 +49,26 @@ export async function subscribeToPush(): Promise<void> {
   });
 }
 
+/**
+ * A browser-level push subscription can exist from a *different* account on
+ * a shared device -- this confirms the subscription (if any) actually
+ * belongs to the currently logged-in user before showing the bell as "on".
+ */
+export async function isSubscribedForCurrentUser(): Promise<boolean> {
+  const subscription = await getExistingPushSubscription();
+  if (!subscription) return false;
+
+  try {
+    const { data } = await apiClient.get<{ subscribed: boolean }>(
+      "/push/subscription-status",
+      { params: { endpoint: subscription.endpoint } }
+    );
+    return data.subscribed;
+  } catch {
+    return false;
+  }
+}
+
 export async function unsubscribeFromPush(): Promise<void> {
   const subscription = await getExistingPushSubscription();
   if (!subscription) return;
