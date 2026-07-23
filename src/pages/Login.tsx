@@ -46,7 +46,7 @@ export function Login() {
       <Box sx={{ minHeight: "100vh", display: "flex", alignItems: "center" }}>
         <Paper elevation={3} sx={{ p: 4, width: "100%" }}>
           <Typography variant="h5" component="h1" gutterBottom>
-            Iniciar sesión en RelevoPass
+            Iniciar sesión en Relevo App
           </Typography>
           <Box
             component="form"

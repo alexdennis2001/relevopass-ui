@@ -97,7 +97,7 @@ export function Layout() {
         <Box
           component="img"
           src={logoVerde}
-          alt="RelevoPass"
+          alt="Relevo App"
           sx={{ height: 40, width: "auto" }}
         />
       </Toolbar>
@@ -181,7 +181,7 @@ export function Layout() {
             <Box
               component="img"
               src={logoBlanco}
-              alt="RelevoPass"
+              alt="Relevo App"
               sx={{ height: { xs: 28, md: 32 }, width: "auto" }}
             />
           </Box>

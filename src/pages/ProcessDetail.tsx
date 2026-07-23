@@ -231,7 +231,6 @@ export function ProcessDetail() {
         sx={{
           display: "flex",
           flexDirection: { xs: "column", sm: "row" },
-          justifyContent: "space-between",
           alignItems: { xs: "flex-start", sm: "flex-start" },
           gap: 2,
           mb: 2,
@@ -247,45 +246,57 @@ export function ProcessDetail() {
             </Typography>
           )}
         </Box>
-        <Stack
-          direction="row"
-          spacing={1}
-          useFlexGap
-          sx={{ alignItems: "center", flexWrap: "wrap" }}
-        >
-          <Chip
+        <Chip
             label={processStatusLabels[process.Status]}
             color={processStatusColor[process.Status]}
-          />
-          {process.Status === "DRAFT" && user?.role === "ADMIN" && (
-            <>
+        />
+      </Box>
+
+      <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            justifyContent: "space-evenly",
+            alignItems: "center",
+            gap: 2,
+            mb: 2,
+          }}
+      >
+        <Stack
+            spacing={1}
+            useFlexGap
+            sx={{ flexDirection: { xs: "column", sm: "row" }, alignItems: "center", flexWrap: "wrap", justifyContent: "space-evenly" }}
+        >
+          {process.CreatedByUserId === user?.id && user?.role === "ADMIN" && (
               <Button
-                variant="outlined"
-                onClick={() => navigate(`/processes/${id}/edit`)}
+                  variant="outlined"
+                  onClick={() => setSaveTemplateOpen(true)}
+              >
+                Guardar como Plantilla
+              </Button>
+          )}
+          {process.Status === "DRAFT" && user?.role === "ADMIN" && (
+              <Button
+                  variant="outlined"
+                  color="warning"
+                  onClick={() => navigate(`/processes/${id}/edit`)}
               >
                 Editar Proceso
               </Button>
+          )}
+          {process.Status === "DRAFT" && user?.role === "ADMIN" && (
               <Button variant="contained" onClick={handleStart} disabled={starting}>
                 {starting ? "Iniciando..." : "Iniciar Proceso"}
               </Button>
-            </>
-          )}
-          {process.CreatedByUserId === user?.id && user?.role === "ADMIN" && (
-            <Button
-              variant="outlined"
-              onClick={() => setSaveTemplateOpen(true)}
-            >
-              Guardar como Plantilla
-            </Button>
           )}
           {canDelete && (
-            <Button
-              variant="outlined"
-              color="error"
-              onClick={() => setDeleteDialogOpen(true)}
-            >
-              Eliminar Proceso
-            </Button>
+              <Button
+                  variant="outlined"
+                  color="error"
+                  onClick={() => setDeleteDialogOpen(true)}
+              >
+                Eliminar Proceso
+              </Button>
           )}
         </Stack>
       </Box>
